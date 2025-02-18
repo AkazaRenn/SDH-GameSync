@@ -64,7 +64,7 @@ class _SyncTarget:
         extra_args = []
         if self._get_sync_mode() == RcloneSyncMode.BISYNC:
             extra_args.extend(["--conflict-resolve", winner.value])
-        sync_result = await self._rclone_execute(extra_args)
+        sync_result = await self._rclone_execute(extra_args, winner)
 
         return sync_result
 
@@ -97,7 +97,7 @@ class _SyncTarget:
         Returns:
         RcloneSyncMode: The sync mode.
         """
-        return RcloneSyncMode.BISYNC
+        return RcloneSyncMode.SYNC
 
     def _get_filter_str_bytes(self) -> bytes | None:
         """
@@ -179,7 +179,7 @@ class _SyncTarget:
         )
         return sync_root, destination_dir
 
-    async def _rclone_execute(self, extra_args: list[str] = []) -> int:
+    async def _rclone_execute(self, extra_args: list[str] = [], winner: RcloneSyncWinner|None = None) -> int:
         """
         Runs the rclone sync process.
 
@@ -199,7 +199,13 @@ class _SyncTarget:
         sync_mode = self._get_sync_mode()
 
         arguments = [sync_mode.value]
-        arguments.extend([sync_root, f"backend:{destination_dir}"])
+        if sync_mode == RcloneSyncMode.BISYNC:
+            arguments.extend([sync_root, f"backend:{destination_dir}"])
+        elif sync_mode == RcloneSyncMode.SYNC:
+            if winner == RcloneSyncWinner.LOCAL:
+                arguments.extend([sync_root, f"backend:{destination_dir}"])
+            else:
+                arguments.extend([f"backend:{destination_dir}", sync_root])
 
         arguments.extend(
             [
