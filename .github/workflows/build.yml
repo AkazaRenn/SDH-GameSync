@@ -13,9 +13,6 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-    - name: Create variables
-      run: echo "TIMESTAMP=$(date +'%Y%m%d%H%M%S')" >> $GITHUB_ENV
-
     - name: Checkout
       uses: actions/checkout@v4
       with:
@@ -24,21 +21,27 @@ jobs:
         submodules: "recursive"
         token: ${{ secrets.GITHUB_TOKEN }}
 
+    - name: Create variables
+      run: |
+        echo "TIMESTAMP=$(date +'%Y%m%d%H%M%S')" >> $GITHUB_ENV
+        echo "PLUGIN_NAME=$(jq -r '.name' plugin.json)" >> $GITHUB_ENV
+        echo "REPO_NAME=$(basename -s .git "$(jq -r '.repository.url' package.json)")" >> $GITHUB_ENV
+        echo "VERSION=$(jq -r '.version' package.json)" >> $GITHUB_ENV
+
     - name: Append hash to plugin version
       run: |
         echo "::notice::This run was triggered by a commit. Appending the commit hash to the plugin version."
 
-        PACKAGE_FILE="package.json"
+        package_file="package.json"
 
         SHA=$(cut -c1-7 <<< "${{ github.event.pull_request.head.sha || github.sha }}")
-        VERSION=$(jq -r '.version' $PACKAGE_FILE)
-        NEW_VERSION="$VERSION-$SHA"
+        NEW_VERSION="${VERSION}-${SHA}"
 
-        echo "::notice::Going from $VERSION to $NEW_VERSION"
+        echo "::notice::Going from ${VERSION} to ${NEW_VERSION}"
 
         tmp=$(mktemp)
-        jq --arg newversion "$NEW_VERSION" '.version = $newversion' $PACKAGE_FILE > $tmp
-        mv $tmp $PACKAGE_FILE
+        jq --arg newversion "${NEW_VERSION}" '.version = $newversion' ${package_file} > "${tmp}"
+        mv "${tmp}" "${package_file}"
 
         echo "::endgroup::"
 
@@ -60,13 +63,21 @@ jobs:
         sudo .vscode/build.sh
         sudo chown -R $(whoami) out
 
-    - name: Unzip plugin
+    - name: Repackage plugin
+      if: ${{ env.PLUGIN_NAME != env.REPO_NAME }}
       run: |
-        for file in out/*.zip; do
-          echo "Unzipping $file"
-          unzip -qq "$file" -d out
-        done
-        tree out
+        built_folder="${PLUGIN_NAME}"
+        built_package="${built_folder}.zip"
+        renamed_folder="${REPO_NAME}"
+        renamed_package="${renamed_folder}.zip"
+
+        cd out
+        unzip -qq "${built_package}"
+        rm -f "${built_package}"
+        mv "${built_folder}" "${renamed_folder}"
+        zip -rq "${renamed_package}" "${renamed_folder}"
+
+        tree
 
     - name: Upload Artifacts
       uses: actions/upload-artifact@v4
