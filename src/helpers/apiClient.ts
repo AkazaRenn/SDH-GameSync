@@ -1,4 +1,4 @@
-import { LifetimeNotification } from "@decky/ui";
+import { AppLifetimeNotification, ScreenshotNotification } from "@decky/ui/dist/globals/steam-client/GameSessions";
 import { sync_cloud_first, sync_local_first } from "./backend";
 import { GLOBAL_SYNC_APP_ID } from "./commonDefs";
 import { getCurrentUserId } from "./utils";
@@ -15,7 +15,7 @@ export function setupScreenshotNotification(): Unregisterable {
 }
 
 export function setupAppLifetimeNotifications(): Unregisterable {
-  return SteamClient.GameSessions.RegisterForAppLifetimeNotifications(async (e: LifetimeNotification) => {
+  return SteamClient.GameSessions.RegisterForAppLifetimeNotifications(async (e: AppLifetimeNotification) => {
     if (e.bRunning) {
       if (Config.get("sync_on_game_start")) {
         Logger.info(`Syncing on game ${e.unAppID} start`);

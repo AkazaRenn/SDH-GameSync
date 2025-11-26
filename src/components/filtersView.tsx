@@ -1,4 +1,4 @@
-import { PropsWithChildren, useEffect, useRef, useState } from "react";
+import { PropsWithChildren, ReactNode, useEffect, useRef, useState } from "react";
 import { FaCopy, FaPen } from "react-icons/fa";
 import { MdDelete } from "react-icons/md";
 import { DialogButton, ReorderableEntry, ReorderableList } from "@decky/ui";
@@ -14,7 +14,7 @@ import IconButton from "./iconButton";
 
 interface FiltersViewProps {
   title: string;
-  description?: string;
+  description?: ReactNode;
   fullPage: boolean;
   getFiltersFunction: () => Promise<Array<string>>;
   setFiltersFunction: (filters: Array<string>) => Promise<void>;
