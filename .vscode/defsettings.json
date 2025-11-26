@@ -5,7 +5,7 @@
     "deckpass"  : "ssap",
     "deckkey"   : "-i ${env:HOME}/.ssh/id_ed25519",
     "deckdir"   : "/home/deck",
-    "pluginname": "Game Sync",
+    "pluginname": "SDH-GameSync",
     "python.analysis.extraPaths": [
         "./py_modules"
     ],

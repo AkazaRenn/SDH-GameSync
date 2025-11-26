@@ -24,8 +24,6 @@ jobs:
     - name: Create variables
       run: |
         echo "TIMESTAMP=$(date +'%Y%m%d%H%M%S')" >> $GITHUB_ENV
-        echo "PLUGIN_NAME=$(jq -r '.name' plugin.json)" >> $GITHUB_ENV
-        echo "REPO_NAME=$(basename -s .git "$(jq -r '.repository.url' package.json)")" >> $GITHUB_ENV
         echo "VERSION=$(jq -r '.version' package.json)" >> $GITHUB_ENV
 
     - name: Append hash to plugin version
@@ -34,13 +32,13 @@ jobs:
 
         package_file="package.json"
 
-        SHA=$(cut -c1-7 <<< "${{ github.event.pull_request.head.sha || github.sha }}")
-        NEW_VERSION="${VERSION}-${SHA}"
+        sha=$(cut -c1-7 <<< "${{ github.event.pull_request.head.sha || github.sha }}")
+        new_version="${VERSION}-${sha}"
 
-        echo "::notice::Going from ${VERSION} to ${NEW_VERSION}"
+        echo "::notice::Going from ${VERSION} to ${new_version}"
 
         tmp=$(mktemp)
-        jq --arg newversion "${NEW_VERSION}" '.version = $newversion' ${package_file} > "${tmp}"
+        jq --arg newversion "${new_version}" '.version = $newversion' ${package_file} > "${tmp}"
         mv "${tmp}" "${package_file}"
 
         echo "::endgroup::"
@@ -62,28 +60,7 @@ jobs:
         # Run the CLI as root to get around Docker's weird permissions
         sudo .vscode/build.sh
         sudo chown -R $(whoami) out
-
-    - name: Repackage plugin
-      if: ${{ env.PLUGIN_NAME != env.REPO_NAME }}
-      run: |
-        built_folder="${PLUGIN_NAME}"
-        built_package="${built_folder}.zip"
-        renamed_folder="${REPO_NAME}"
-        renamed_package="${renamed_folder}.zip"
-
-        cd out
-        unzip -qq "${built_package}"
-        rm -f "${built_package}"
-        mv "${built_folder}" "${renamed_folder}"
-        zip -rq "${renamed_package}" "${renamed_folder}"
-
-        tree
-
-    - name: Upload Artifacts
-      uses: actions/upload-artifact@v4
-      with:
-        name: output
-        path: out/*/
+        unzip -l out/*.zip
 
     - name: Release
       uses: softprops/action-gh-release@v2
@@ -92,3 +69,17 @@ jobs:
         tag_name: ${{ env.TIMESTAMP }}
         prerelease: true
         files: out/*.zip
+
+    - name: Unzip plugin
+      run: |
+        for file in out/*.zip; do
+          echo "Unzipping ${file}"
+          unzip -qq "$file" -d out
+        done
+        tree out
+
+    - name: Upload artifacts
+      uses: actions/upload-artifact@v4
+      with:
+        name: output
+        path: out/*/
