@@ -76,6 +76,7 @@ class SyncTargetConfigPage extends RoutePage<SyncTargetConfigPageParams> {
           title: "Sync Logs",
           // icon: <FaFileAlt />,
           hideTitle: true,
+          visible: true,
           content:
             <LogsView
               title="Sync Logs"
@@ -117,6 +118,7 @@ class SyncTargetConfigPage extends RoutePage<SyncTargetConfigPageParams> {
         {
           title: "Target Filter",
           hideTitle: true,
+          visible: true,
           content:
             <FiltersView
               title="Target Filter"
@@ -142,6 +144,7 @@ class SyncTargetConfigPage extends RoutePage<SyncTargetConfigPageParams> {
         {
           title: "Shared Filter",
           hideTitle: true,
+          visible: true,
           content:
             <SharedFiltersView
               title="Shared Filter"
