@@ -13,7 +13,7 @@ class Config extends Observable {
 
   public get(key: string) {
     let value = this.data[key];
-    if (value === undefined)) {
+    if (value === undefined) {
       value = DefaultConfig[key]
       this.set(key, value);
     }
