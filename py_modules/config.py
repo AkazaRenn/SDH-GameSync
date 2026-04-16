@@ -44,7 +44,7 @@ class Config():
              If the entry doesn't exist in the default config, the value from the default config fallback will be returned.
         """
         value = cls.get_config().get(key)
-        if not value:
+        if value is None:
             value = cls._default_config.get(key)
             cls.set_config(key, value)
 
