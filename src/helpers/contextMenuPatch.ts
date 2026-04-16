@@ -1,4 +1,4 @@
-// Derived from https://github.com/SteamGridDB/decky-steamgriddb/blob/main/src/patches/contextMenuPatch.tsx
+// Derived from https://github.com/SteamGridDB/decky-steamgriddb/blob/7168307beb91c336a65899fa63c38f96f8b4624c/src/patches/contextMenuPatch.tsx
 
 import { createElement, FC } from 'react';
 import {
