@@ -163,7 +163,11 @@ class RcloneManager:
         with subprocess.Popen(
             [RCLONE_BIN_PATH, "--version"], stdout=subprocess.PIPE
         ) as p:
-            lines = p.stdout.readlines()
+            if p.stdout:
+                lines = p.stdout.readlines()
+            else:
+                logger.error("No stdout getting rclone version")
+                lines = []
 
         pattern = re.compile(rb"rclone v[\d\.]+")
         for line in lines:
@@ -223,4 +227,7 @@ class RcloneManager:
             stdout=subprocess.PIPE,
             text=True,
         ) as p:
-            logger.debug("Creating cloud destination: %s", p.stdout.read())
+            if p.stdout:
+                logger.debug("Creating cloud destination: %s", p.stdout.read())
+            else:
+                logger.warning("No stdout when creating cloud destination")

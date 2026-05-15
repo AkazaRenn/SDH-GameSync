@@ -5,6 +5,7 @@ from shutil import which
 from subprocess import run, Popen, PIPE
 from tempfile import gettempdir
 import os, signal
+import re
 import socket
 
 from common_defs import *
@@ -25,7 +26,7 @@ def is_port_in_use(port: int) -> bool:
         return s.connect_ex(("localhost", port)) == 0
 
 
-def _get_process_tree(pid):
+def _get_process_tree(pid: int):
     """
     Retrieves the process tree of a given process ID.
 
@@ -35,14 +36,18 @@ def _get_process_tree(pid):
     Returns:
     list: A list of child process IDs.
     """
-    children = []
+    children: list[int] = []
     with Popen(["ps", "--ppid", str(pid), "-o", "pid="], stdout=PIPE) as p:
-        lines = p.stdout.readlines()
+        if p.stdout:
+            lines = p.stdout.readlines()
+        else:
+            logger.warning("No stdout when retrieving the process tree")
+            lines = []
     for chldPid in lines:
         chldPid = chldPid.strip()
         if not chldPid:
             continue
-        children.extend([int(chldPid.decode())])
+        children.append(int(chldPid.decode()))
 
     return children
 
@@ -131,7 +136,7 @@ def get_available_filters() -> list[int]:
     Returns:
     list[int]: A list of available sync targets.
     """
-    sync_paths = list()
+    sync_paths: list[int] = list()
     for filter in PLUGIN_CONFIG_DIR.glob("*.filter"):
         if filter.stem in SYNC_FILTER_TYPE_DICT:
             sync_paths.append(SYNC_FILTER_TYPE_DICT[filter.stem])
@@ -189,10 +194,21 @@ def combine_clips(clip_dir: Path) -> list[Path]:
 
     outputs: list[Path] = list()
     for session_path in clip_dir.rglob("session.mpd"):
-        output_path = Path(gettempdir()) / f"{session_path.parent.name}.mkv"
-        result = run([ffmpeg_path, "-y", "-i", "session.mpd", "-c", "copy", output_path], cwd=session_path.parent, capture_output=True, env={})
+        session_xml = session_path.read_text()
+        session_xml = re.sub(r'\s*start\s*=\s*"[^"]*"', "", session_xml)
+        modified_session_path = session_path.with_stem("modified")
+        logger.debug("Updated session xml: \n%s", session_xml)
+        modified_session_path.write_text(session_xml)
+
+        output_path = (Path(gettempdir()) / session_path.parent.name).with_suffix(".mkv").absolute()
+        result = run([ffmpeg_path, "-y", "-i", modified_session_path.name, "-c", "copy", output_path],
+                      input=session_xml,
+                      cwd=session_path.parent,
+                      text=True,
+                      env={})
+
         if result.returncode == 0:
-            outputs.append(output_path.absolute())
+            outputs.append(output_path)
         else:
             logger.error("Error combining clip %s\nstdout: %s\nstderr: %s", session_path, result.stdout, result.stderr)
 
