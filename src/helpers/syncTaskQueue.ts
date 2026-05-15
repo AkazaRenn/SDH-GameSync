@@ -81,12 +81,12 @@ class SyncTaskQueue extends Observable {
     }
   }
 
-  public async addScreenshotSyncTask(appId: number, screenshotIndex: number) {
+  public async addScreenshotSyncTask(appId: string, screenshotIndex: number) {
     this.pushTask(async () => await sync_screenshot(await SteamClient.Screenshots.GetLocalScreenshotPath(appId, screenshotIndex)))
       .then((exitCode) => {
         if (exitCode == 0) {
           if (Config.get("capture_delete_after_upload")) {
-            SteamClient.Screenshots.DeleteLocalScreenshot(appId.toString(), screenshotIndex)
+            SteamClient.Screenshots.DeleteLocalScreenshot(appId, screenshotIndex)
               .then(() =>
                 Logger.info(`Screenshot ${appId}:${screenshotIndex} uploaded and deleted locally`))
               .catch(() => {

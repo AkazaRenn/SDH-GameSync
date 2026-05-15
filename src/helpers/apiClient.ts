@@ -10,9 +10,9 @@ export function setupScreenshotNotification(): Unregisterable {
     if (Config.get("capture_upload") && e.details && e.strOperation == "written") {
       if ((!Config.get("sync_in_offline_mode")) && window.App.m_CurrentUser.bIsOfflineMode) {
         Logger.info("Skip uploading screenshot in offline mode");
-        return;
+      } else {
+        await SyncTaskQeueue.addScreenshotSyncTask(e.unAppID.toString(), e.hScreenshot);
       }
-      await SyncTaskQeueue.addScreenshotSyncTask(e.unAppID, e.hScreenshot);
     }
   });
 }

@@ -293,6 +293,8 @@ class CaptureSyncTarget(_SyncTarget):
     def __init__(self, capture_path: str):
         if not capture_path:
             raise ValueError("capture_path is required")
+        if not Path(capture_path).is_file():
+            raise ValueError(f"Invalid capture path: {capture_path}")
         super().__init__(capture_path)
         self._capture_path = Path(capture_path)
 
