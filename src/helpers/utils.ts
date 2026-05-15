@@ -12,10 +12,6 @@ export function getAppName(appId: number): string {
   }
 }
 
-export function getCurrentUserId(): number {
-  return Number(BigInt.asUintN(32, BigInt(window.App.m_CurrentUser.strSteamID)));
-};
-
 export function reduceSlashes(input: string): string {
   return input.replace(/\/+/g, '/');
 }

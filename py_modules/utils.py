@@ -122,28 +122,6 @@ def get_plugin_log() -> str:
         return f.read()
 
 
-def getLocalScreenshotPath(user_id: int, screenshot_url: str) -> str:
-    """
-    Returns the local screenshot path for a given user and screenshot URL.
-
-    Parameters:
-    user_id (int): The user ID.
-    screenshot_url (str): The URL of the screenshot,
-                          example: "https://steamloopback.host/screenshots/7/screenshots/20250218080004_1.jpg"
-
-    Returns:
-    str: The local screenshot path,
-         example: /home/deck/.steam/steam/userdata/9999999/760/remote/7/screenshots/20250218080004_1.jpg
-    """
-    subpath = "/".join(screenshot_url.split("/")[-3:])
-    if not subpath:
-        logger.error("Invalid screenshot URL: %s", screenshot_url)
-
-    return (
-        f"{decky.DECKY_USER_HOME}/.steam/steam/userdata/{user_id}/760/remote/{subpath}"
-    )
-
-
 def get_available_filters() -> list[int]:
     """
     Returns a list of available sync targets.

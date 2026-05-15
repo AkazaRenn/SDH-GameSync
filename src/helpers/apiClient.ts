@@ -1,7 +1,6 @@
 import { AppLifetimeNotification, ScreenshotNotification } from "@decky/ui/dist/globals/steam-client/GameSessions";
 import { sync_cloud_first, sync_local_first } from "./backend";
 import { GLOBAL_SYNC_APP_ID } from "./commonDefs";
-import { getCurrentUserId } from "./utils";
 import Logger from "./logger";
 import Config from "./config";
 import SyncTaskQeueue from "./syncTaskQueue";
@@ -9,7 +8,11 @@ import SyncTaskQeueue from "./syncTaskQueue";
 export function setupScreenshotNotification(): Unregisterable {
   return SteamClient.GameSessions.RegisterForScreenshotNotification(async (e: ScreenshotNotification) => {
     if (Config.get("capture_upload") && e.details && e.strOperation == "written") {
-      await SyncTaskQeueue.addScreenshotSyncTask(getCurrentUserId(), e.details.strUrl, e.details.strGameID, e.details.hHandle);
+      if ((!Config.get("sync_in_offline_mode")) && window.App.m_CurrentUser.bIsOfflineMode) {
+        Logger.info("Skip uploading screenshot in offline mode");
+        return;
+      }
+      await SyncTaskQeueue.addScreenshotSyncTask(e.unAppID, e.hScreenshot);
     }
   });
 }

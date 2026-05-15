@@ -296,7 +296,7 @@ class CaptureSyncTarget(_SyncTarget):
         super().__init__(capture_path)
         self._capture_path = Path(capture_path)
 
-    async def sync(self, _=None) -> int:
+    async def sync(self, winner: RcloneSyncWinner = RcloneSyncWinner.CLOUD) -> int:
         """
         Runs the rclone sync process.
 
@@ -305,7 +305,7 @@ class CaptureSyncTarget(_SyncTarget):
         """
         return await super().sync(RcloneSyncWinner.LOCAL)
 
-    def _get_sync_paths(self, _=None) -> tuple[str, str]:
+    def _get_sync_paths(self, winner: RcloneSyncWinner = RcloneSyncWinner.CLOUD) -> tuple[str, str]:
         """
         Retrieves the sync root and destination directory from the configuration.
 
@@ -319,7 +319,7 @@ class CaptureSyncTarget(_SyncTarget):
             f"cloud:{destination}",
         )
 
-    def _get_rclone_log_path(self) -> Path:
+    def _get_rclone_log_path(self, max_log_files: int = 0) -> Path:
         """
         Returns the rclone log file path, for screenshots it will be the config log
 

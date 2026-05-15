@@ -76,11 +76,9 @@ class Plugin:
         logger.debug("Executing resync_cloud_first()")
         return await GlobalSyncTarget().resync(RcloneSyncWinner.CLOUD)
 
-    async def sync_screenshot(self, user_id: int, screenshot_url: str) -> int:
+    async def sync_screenshot(self, path: str) -> int:
         logger.debug("Executing sync_screenshot()")
-        return await CaptureSyncTarget(
-            utils.getLocalScreenshotPath(user_id, screenshot_url)
-        ).sync()
+        return await CaptureSyncTarget(path).sync()
 
     async def delete_lock_files(self):
         logger.debug("Executing delete_lock_files()")

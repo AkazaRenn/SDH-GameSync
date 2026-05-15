@@ -40,7 +40,9 @@ class SyncTaskQueue extends Observable {
   }
 
   public async addSyncTask(syncFunction: (appId: number) => Promise<number>, appId: number, gameRunning?: boolean, pId?: number) {
-    if (!SyncFilters.has(appId)) { return; }
+    if (!SyncFilters.has(appId)) {
+      return;
+    }
 
     if (pId) {
       await pause_process(pId);
@@ -79,21 +81,21 @@ class SyncTaskQueue extends Observable {
     }
   }
 
-  public async addScreenshotSyncTask(userId: number, screenshotUrl: string, gameId: string, handle: number) {
-    this.pushTask(async () => await sync_screenshot(userId, screenshotUrl))
+  public async addScreenshotSyncTask(appId: number, screenshotIndex: number) {
+    this.pushTask(async () => await sync_screenshot(await SteamClient.Screenshots.GetLocalScreenshotPath(appId, screenshotIndex)))
       .then((exitCode) => {
         if (exitCode == 0) {
           if (Config.get("capture_delete_after_upload")) {
-            SteamClient.Screenshots.DeleteLocalScreenshot(gameId, handle)
+            SteamClient.Screenshots.DeleteLocalScreenshot(appId.toString(), screenshotIndex)
               .then(() =>
-                Logger.info(`Screenshot ${screenshotUrl} uploaded and deleted locally`))
+                Logger.info(`Screenshot ${appId}:${screenshotIndex} uploaded and deleted locally`))
               .catch(() => {
-                Logger.warning(`Failed to delete screenshot ${screenshotUrl} locally`);
+                Logger.warning(`Failed to delete screenshot ${appId}:${screenshotIndex} locally`);
                 Toaster.toast("Failed to delete screenshot");
               })
           }
         } else {
-          Logger.error(`Failed to upload screenshot ${screenshotUrl}, exit code: ${exitCode}`);
+          Logger.error(`Failed to upload screenshot ${appId}:${screenshotIndex}, exit code: ${exitCode}`);
           Toaster.toast(`Failed to upload screenshot`);
         }
       });
