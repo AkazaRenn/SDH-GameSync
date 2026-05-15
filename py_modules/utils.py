@@ -1,9 +1,11 @@
 import decky
 
-import socket
-from subprocess import Popen, PIPE
 from pathlib import Path
+from shutil import which
+from subprocess import run, Popen, PIPE
+from tempfile import gettempdir
 import os, signal
+import socket
 
 from common_defs import *
 from config import Config
@@ -172,3 +174,32 @@ def set_filters(file: Path, filters: list[str]):
     str_to_write = "\n".join(stripped for path in filters if (stripped := path.strip()))
     with file.open("w") as f:
         f.write(str_to_write)
+
+
+def combine_clips(clip_dir: Path) -> list[Path]:
+    if not clip_dir.is_dir():
+        return []
+
+    ffmpeg_path = which("ffmpeg")
+    if ffmpeg_path:
+        logger.debug("Using ffmpeg at %s", ffmpeg_path)
+    else:
+        logger.error("ffmpeg not available")
+        return []
+
+    outputs: list[Path] = list()
+    for session_path in clip_dir.rglob("session.mpd"):
+        output_path = Path(gettempdir()) / f"{session_path.parent.name}.mkv"
+        result = run([ffmpeg_path, "-y", "-i", "session.mpd", "-c", "copy", output_path], cwd=session_path.parent, capture_output=True, env={})
+        if result.returncode == 0:
+            outputs.append(output_path.absolute())
+        else:
+            logger.error("Error combining clip %s\nstdout: %s\nstderr: %s", session_path, result.stdout, result.stderr)
+
+    if len(outputs) == 1:
+        output = outputs[0]
+        new_name = output.with_name(clip_dir.name).with_suffix(output.suffix)
+        if not new_name.exists():
+            outputs[0] = output.rename(new_name)
+
+    return outputs

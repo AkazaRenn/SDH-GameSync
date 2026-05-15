@@ -1,11 +1,11 @@
-import signal
 from typing import Any
+import signal
 
 from common_defs import *
 from config import Config
-import utils
 from rclone_manager import RcloneManager
 from sync_target import *
+import utils
 
 
 class Plugin:
@@ -76,9 +76,13 @@ class Plugin:
         logger.debug("Executing resync_cloud_first()")
         return await GlobalSyncTarget().resync(RcloneSyncWinner.CLOUD)
 
-    async def sync_screenshot(self, path: str) -> int:
-        logger.debug("Executing sync_screenshot()")
-        return await CaptureSyncTarget(path).sync()
+    async def copy_capture(self, path: str) -> int:
+        logger.debug("Executing copy_capture(path=%s), path")
+        return await CaptureCopyTarget(path).sync()
+
+    async def copy_clip(self, clip: str, path: str) -> int:
+        logger.debug("Executing copy_clip(clip=%s, path=%s)", clip, path)
+        return await ClipCopyTarget(clip, path).sync()
 
     async def delete_lock_files(self):
         logger.debug("Executing delete_lock_files()")

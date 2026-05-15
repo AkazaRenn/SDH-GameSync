@@ -1,12 +1,13 @@
 import fastq from "fastq";
 import type { queueAsPromised } from "fastq";
-import { sync_screenshot, pause_process, resume_process } from "./backend";
+import { copy_capture, pause_process, resume_process, copy_clip } from "./backend";
 import * as Toaster from "./toaster";
 import * as SyncStateTracker from "./syncStateTracker";
 import Observable from "../types/observable";
 import Logger from "./logger"
 import Config from "./config";
 import SyncFilters from "./syncFilters";
+import { GLOBAL_SYNC_APP_ID } from "./commonDefs";
 
 async function worker(fn: () => Promise<number>): Promise<number | undefined> {
   try {
@@ -79,10 +80,17 @@ class SyncTaskQueue extends Observable {
       Logger.warning(`Skipping download sync for ${appId} due to missing upload sync`);
       Toaster.toast("Skipping download sync");
     }
+
+    // To avoid uploading the same screenshots repeatedly.
+    if ((appId == GLOBAL_SYNC_APP_ID) &&
+         Config.get("capture_delete_after_upload") &&
+         Config.get("capture_upload_on_sync")) {
+      await this.addCapturesSyncTask();
+    }
   }
 
   public async addScreenshotSyncTask(appId: string, screenshotIndex: number) {
-    this.pushTask(async () => await sync_screenshot(await SteamClient.Screenshots.GetLocalScreenshotPath(appId, screenshotIndex)))
+    this.pushTask(async () => await copy_capture(await SteamClient.Screenshots.GetLocalScreenshotPath(appId, screenshotIndex)))
       .then((exitCode) => {
         if (exitCode == 0) {
           if (Config.get("capture_delete_after_upload")) {
@@ -99,6 +107,25 @@ class SyncTaskQueue extends Observable {
           Toaster.toast(`Failed to upload screenshot`);
         }
       });
+  }
+
+  public async addCapturesSyncTask() {
+    (await SteamClient.Screenshots.GetAllLocalScreenshots()).forEach(screenshot =>
+      this.addScreenshotSyncTask(screenshot.nAppID.toString(), screenshot.hHandle));
+
+    const recordingPath = window.settingsStore.m_ClientSettings.gamerecording_background_path;
+    for (const clip of window.g_GRS.m_clips.keys()) {
+      this.pushTask(async () => await copy_clip(clip, recordingPath))
+        .then((exitCode) => {
+        if (exitCode == 0) {
+          window.g_GRS.m_clips.delete(clip);
+          Logger.info(`Clip ${clip} uploaded and deleted locally`);
+        } else {
+          Logger.error(`Failed to upload clip ${clip}, exit code: ${exitCode}`);
+          Toaster.toast(`Failed to upload clip`);
+        }
+      });
+    }
   }
 
   private async pushTask(fn: () => Promise<number>): Promise<number | undefined> {

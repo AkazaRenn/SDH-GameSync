@@ -1,8 +1,9 @@
 import decky
 
 from datetime import datetime
+from asyncio.subprocess import create_subprocess_exec
 from pathlib import Path
-from asyncio.subprocess import create_subprocess_exec, PIPE
+from shutil import rmtree
 from subprocess import list2cmdline
 from typing import Awaitable, Callable
 import logging
@@ -286,39 +287,38 @@ class GameSyncTarget(_SyncTarget):
             self._sync_mode = RcloneSyncMode.SYNC
 
 
-class CaptureSyncTarget(_SyncTarget):
+class SingleFileCopyTarget(_SyncTarget):
     _filter_required = False
     _sync_mode = RcloneSyncMode.COPY
 
-    def __init__(self, capture_path: str):
-        if not capture_path:
+    def __init__(self, file_path: str, destination: str):
+        if not file_path:
             raise ValueError("capture_path is required")
-        if not Path(capture_path).is_file():
-            raise ValueError(f"Invalid capture path: {capture_path}")
-        super().__init__(capture_path)
-        self._capture_path = Path(capture_path)
+        if not Path(file_path).is_file():
+            raise ValueError(f"Invalid file path: {file_path}")
+        super().__init__(file_path)
+        self._file_path = Path(file_path)
+        self._destination = destination
 
-    async def sync(self, winner: RcloneSyncWinner = RcloneSyncWinner.CLOUD) -> int:
+    async def sync(self, winner: RcloneSyncWinner = RcloneSyncWinner.LOCAL) -> int:
         """
         Runs the rclone sync process.
 
         Returns:
         int: Exit code of the rclone sync process if it runs, -1 if it cannot run.
         """
-        return await super().sync(RcloneSyncWinner.LOCAL)
+        return await super().sync(winner)
 
-    def _get_sync_paths(self, winner: RcloneSyncWinner = RcloneSyncWinner.CLOUD) -> tuple[str, str]:
+    def _get_sync_paths(self, winner: RcloneSyncWinner = RcloneSyncWinner.LOCAL) -> tuple[str, str]:
         """
         Retrieves the sync root and destination directory from the configuration.
 
         Returns:
         tuple[str, str]: A tuple containing the source sync path and destination sync path.
         """
-        destination = Config.get_config_item("capture_upload_destination")
-
         return (
-            str(self._capture_path),
-            f"cloud:{destination}",
+            str(self._file_path),
+            f"cloud:{self._destination}",
         )
 
     def _get_rclone_log_path(self, max_log_files: int = 0) -> Path:
@@ -338,6 +338,32 @@ class CaptureSyncTarget(_SyncTarget):
         list[str]: The verbose flag in a list.
         """
         return []
+
+
+class CaptureCopyTarget(SingleFileCopyTarget):
+    def __init__(self, screenshot_path: str):
+        super().__init__(screenshot_path, Config.get_config_item("capture_upload_destination"))
+
+
+class ClipCopyTarget():
+    def __init__(self, clip: str, path: str):
+        self._clip_dir = Path(path) / "clips" / clip
+        self._clips = combine_clips(self._clip_dir)
+        if not self._clips:
+            raise ValueError(f"Empty outputs {self._clip_dir}", self._clip_dir)
+
+    async def sync(self) -> int:
+        destination = Config.get_config_item("capture_upload_destination_video")
+        for clip in self._clips:
+            logger.debug("Copying clip %s", clip)
+            rc = await SingleFileCopyTarget(str(clip), destination).sync()
+            clip.unlink()
+
+            if rc != 0:
+                return rc
+
+        rmtree(self._clip_dir)
+        return 0
 
 
 def get_sync_target(app_id: int) -> _SyncTarget:

@@ -20,7 +20,8 @@ export const sync_local_first = callable<[app_id: number], number>("sync_local_f
 export const sync_cloud_first = callable<[app_id: number], number>("sync_cloud_first");
 export const resync_local_first = callable<[], number>("resync_local_first");
 export const resync_cloud_first = callable<[], number>("resync_cloud_first");
-export const sync_screenshot = callable<[path: string], number>("sync_screenshot");
+export const copy_capture = callable<[path: string], number>("copy_capture");
+export const copy_clip = callable<[name: string, path: string], number>("copy_clip");
 export const delete_lock_files = callable<[], void>("delete_lock_files");
 
 // Processes
