@@ -16,6 +16,11 @@ export function setupScreenshotNotification(): Unregisterable {
 
 export function setupAppLifetimeNotifications(): Unregisterable {
   return SteamClient.GameSessions.RegisterForAppLifetimeNotifications(async (e: AppLifetimeNotification) => {
+    if ((!Config.get("sync_in_offline_mode")) && window.App.m_CurrentUser.bIsOfflineMode) {
+      Logger.info("Skip syncing in offline mode");
+      return;
+    }
+
     if (e.bRunning) {
       if (Config.get("sync_on_game_start")) {
         Logger.info(`Syncing on game ${e.unAppID} start`);

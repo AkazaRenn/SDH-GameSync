@@ -18,5 +18,6 @@
     "advanced_mode": false,
     "strict_game_sync": false,
     "sync_root": "/",
-    "sync_destination": "sdh-game-sync"
+    "sync_destination": "sdh-game-sync",
+    "sync_in_offline_mode": true
 }

@@ -84,6 +84,15 @@ export default function quickAccessMenu() {
             }}
           />
         </PanelSectionRow>
+        <PanelSectionRow>
+          <ToggleField
+            label="Sync in offline mode"
+            checked={Config.get("sync_in_offline_mode")}
+            onChange={(e) => {
+              Config.set("sync_in_offline_mode", e);
+            }}
+          />
+        </PanelSectionRow>
       </PanelSection>
 
       <PanelSection title="Screenshots">
