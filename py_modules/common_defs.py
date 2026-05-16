@@ -1,14 +1,16 @@
 import decky
 
-from pathlib import Path
 from enum import Enum
 from packaging.version import Version
+from pathlib import Path
+from tempfile import gettempdir
 import ssl, certifi
 
 RCLONE_PORT = 53682
 
 PLUGIN_DEFAULT_CONFIG_PATH = Path(decky.DECKY_PLUGIN_DIR) / "default_config.json"
 PLUGIN_CONFIG_DIR = Path(decky.DECKY_PLUGIN_SETTINGS_DIR)
+PLUGIN_TEMP_DIR = Path(gettempdir()) / PLUGIN_CONFIG_DIR.name
 
 RCLONE_BIN_PATH = Path(decky.DECKY_PLUGIN_RUNTIME_DIR) / "rclone"
 RCLONE_CFG_PATH = PLUGIN_CONFIG_DIR / "rclone.conf"

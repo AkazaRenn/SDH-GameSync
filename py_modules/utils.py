@@ -3,7 +3,6 @@ import decky
 from pathlib import Path
 from shutil import which
 from subprocess import run, Popen, PIPE
-from tempfile import gettempdir
 import os, signal
 import re
 import socket
@@ -200,7 +199,8 @@ def combine_clips(clip_dir: Path) -> list[Path]:
         logger.debug("Updated session xml: \n%s", session_xml)
         modified_session_path.write_text(session_xml)
 
-        output_path = (Path(gettempdir()) / session_path.parent.name).with_suffix(".mkv").absolute()
+        PLUGIN_TEMP_DIR.mkdir(exist_ok=True)
+        output_path = (PLUGIN_TEMP_DIR / session_path.parent.name).with_suffix(".mkv").absolute()
         result = run([ffmpeg_path, "-y", "-i", modified_session_path.name, "-c", "copy", output_path],
                       input=session_xml,
                       cwd=session_path.parent,
@@ -215,7 +215,6 @@ def combine_clips(clip_dir: Path) -> list[Path]:
     if len(outputs) == 1:
         output = outputs[0]
         new_name = output.with_name(clip_dir.name).with_suffix(output.suffix)
-        if not new_name.exists():
-            outputs[0] = output.rename(new_name)
+        outputs[0] = output.rename(new_name)
 
     return outputs

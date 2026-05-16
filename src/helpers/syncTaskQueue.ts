@@ -54,9 +54,6 @@ class SyncTaskQueue extends Observable {
         .then((exitCode) => {
           if (exitCode == 0 || exitCode == 6) {
             Logger.info(`Sync for "${appId}" finished`);
-            if (gameRunning == undefined) {
-              Toaster.toast("Sync finished");
-            }
           } else {
             Logger.error(`Sync for for ${appId} failed with exit code ${exitCode}`);
             Toaster.toast(`Sync failed, click to see the errors`, 5000, () => {

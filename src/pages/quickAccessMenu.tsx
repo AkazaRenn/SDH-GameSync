@@ -8,6 +8,7 @@ import { GLOBAL_SYNC_APP_ID } from "../helpers/commonDefs";
 import { updateRclone } from "../helpers/utils";
 import { get_cloud_type, sync_cloud_first, create_cloud_destination } from "../helpers/backend";
 import * as Popups from "../components/popups";
+import * as Toaster from "../helpers/toaster";
 import SyncTargetConfigPage from "./syncTargetConfigPage";
 import PluginLogsPage from "./pluginLogsPage";
 import ButtonWithIcon from "../components/buttonWithIcon";
@@ -23,6 +24,8 @@ export default function quickAccessMenu() {
   const [syncInProgress, setSyncInProgress] = useState<boolean>(SyncTaskQueue.busy);
   const [hasProvider, setHasProvider] = useState<boolean>(true);
 
+  let syncTriggeredManually = false;
+
   useEffect(() => {
     get_cloud_type().then((e) => setHasProvider(Boolean(e)));
     const registrations: Array<Unregisterable> = [];
@@ -30,7 +33,13 @@ export default function quickAccessMenu() {
     registrations.push(Config.on("capture_upload", setShowCaptureOptions));
     registrations.push(Config.on("advanced_mode", setShowAdvancedOptions));
     registrations.push(SyncFilters.on(SyncFilters.events.UPDATE, () => setGlobalFilterAvailable(SyncFilters.has(GLOBAL_SYNC_APP_ID))));
-    registrations.push(SyncTaskQueue.on(SyncTaskQueue.events.BUSY, setSyncInProgress));
+    registrations.push(SyncTaskQueue.on(SyncTaskQueue.events.BUSY, (busy: boolean) => {
+      setSyncInProgress(busy);
+      if ((busy == false) && (syncTriggeredManually == true)) {
+        Toaster.toast("Sync finished");
+        syncTriggeredManually = false;
+      }
+    }));
 
     return () => {
       registrations.forEach(e => e.unregister());
@@ -59,6 +68,7 @@ export default function quickAccessMenu() {
             icon={<FaSave className={syncInProgress ? "cloudSaveForkRotatingIcon" : ""} />}
             disabled={syncInProgress || (!globalFilterAvailable)}
             onClick={() => {
+              syncTriggeredManually = true;
               SyncTaskQueue.addSyncTask(sync_cloud_first, GLOBAL_SYNC_APP_ID);
             }}
           >
