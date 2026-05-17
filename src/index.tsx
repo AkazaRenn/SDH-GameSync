@@ -9,19 +9,25 @@ import ConfigCloudPage from "./pages/configCloudPage";
 import SyncTargetConfigPage from "./pages/syncTargetConfigPage";
 import ContextMenuPatch from "./helpers/contextMenuPatch";
 import QuickAccessMenu from "./pages/quickAccessMenu";
+import Logger from "./helpers/logger";
 
 export default definePlugin(() => {
   const registrations: Array<Unregisterable> = [];
 
   registrations.push(ApiClient.setupAppLifetimeNotifications());
   registrations.push(ApiClient.setupScreenshotNotification());
-  registrations.push(ApiClient.patchClipsMap());
 
   registrations.push(PluginLogsPage.register());
   registrations.push(ConfigCloudPage.register());
   registrations.push(SyncTargetConfigPage.register());
 
   registrations.push(ContextMenuPatch.register());
+
+  // Delay patching the clips map, it may not be available immediately when Steam is loaded
+  setTimeout(() => {
+    registrations.push(ApiClient.patchClipsMap());
+    Logger.info("Clips map patched successfully");
+  }, 5000);
 
   updateRclone();
 
