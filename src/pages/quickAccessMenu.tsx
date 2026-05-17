@@ -140,7 +140,7 @@ export default function quickAccessMenu() {
             <ButtonWithIcon
               icon={<FaFileUpload />}
               onClick={() =>
-                Popups.multipleTextInputPopup("Captures Upload Destinations",
+                Popups.multipleTextInputsPopup("Captures Upload Destinations",
                   {
                     "Screenshots": {
                       value: Config.get("capture_upload_destination"),

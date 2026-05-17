@@ -22,7 +22,7 @@ export function textInputPopup(title: ReactNode, data: textInputData) {
   );
 }
 
-export function multipleTextInputPopup(title: ReactNode, data: Record<string, textInputData>) {
+export function multipleTextInputsPopup(title: ReactNode, data: Record<string, textInputData>) {
   const draft: Record<string, string> = Object.fromEntries(
     Object.entries(data).map(([label, textData]) => [label, textData.value])
   );
