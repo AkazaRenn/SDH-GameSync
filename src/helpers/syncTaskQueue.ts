@@ -145,7 +145,7 @@ class SyncTaskQueue extends Observable {
 
       for (const [key, value] of window.g_GRS.m_clips) {
         if (value.temporary === false) {
-          this.addClipSyncTask(key);
+          await this.addClipSyncTask(key);
         }
       }
 
