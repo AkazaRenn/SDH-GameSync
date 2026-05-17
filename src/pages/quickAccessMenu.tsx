@@ -19,6 +19,7 @@ import SyncFilters from "../helpers/syncFilters";
 
 export default function quickAccessMenu() {
   const [showCaptureOptions, setShowCaptureOptions] = useState<boolean>(Config.get("capture_upload"));
+  const [showCaptureUploadOnSync, setShowCaptureUploadOnSync] = useState<boolean>(Config.get("capture_delete_after_upload"));
   const [showAdvancedOptions, setShowAdvancedOptions] = useState<boolean>(Config.get("advanced_mode"));
   const [globalFilterAvailable, setGlobalFilterAvailable] = useState<boolean>(SyncFilters.has(GLOBAL_SYNC_APP_ID));
   const [syncInProgress, setSyncInProgress] = useState<boolean>(SyncTaskQueue.busy);
@@ -31,6 +32,7 @@ export default function quickAccessMenu() {
     const registrations: Array<Unregisterable> = [];
 
     registrations.push(Config.on("capture_upload", setShowCaptureOptions));
+    registrations.push(Config.on("capture_delete_after_upload", setShowCaptureUploadOnSync));
     registrations.push(Config.on("advanced_mode", setShowAdvancedOptions));
     registrations.push(SyncFilters.on(SyncFilters.events.UPDATE, () => setGlobalFilterAvailable(SyncFilters.has(GLOBAL_SYNC_APP_ID))));
     registrations.push(SyncTaskQueue.on(SyncTaskQueue.events.BUSY, (busy: boolean) => {
@@ -105,10 +107,10 @@ export default function quickAccessMenu() {
         </PanelSectionRow>
       </PanelSection>
 
-      <PanelSection title="Screenshots">
+      <PanelSection title="Captures">
         <PanelSectionRow>
           <ToggleField
-            label="Upload screenshots"
+            label="Upload captures"
             checked={Config.get("capture_upload")}
             onChange={e => Config.set("capture_upload", e)}
           />
@@ -123,11 +125,22 @@ export default function quickAccessMenu() {
               }}
             />
           </PanelSectionRow>
+          {showCaptureUploadOnSync && (
+            <PanelSectionRow>
+              <ToggleField
+                label="Upload on global sync"
+                checked={Config.get("capture_upload_on_sync")}
+                onChange={(e) => {
+                  Config.set("capture_upload_on_sync", e);
+                }}
+              />
+            </PanelSectionRow>
+          )}
           <PanelSectionRow>
             <ButtonWithIcon
               icon={<FaFileUpload />}
               onClick={() =>
-                Popups.textInputPopup("Screenshot Upload Destination",
+                Popups.textInputPopup("Captures Upload Destination",
                   Config.get("capture_upload_destination"),
                   (e) => Config.set("capture_upload_destination", e))}
             >

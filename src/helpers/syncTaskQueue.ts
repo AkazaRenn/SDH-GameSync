@@ -1,6 +1,6 @@
 import fastq from "fastq";
 import type { queueAsPromised } from "fastq";
-import { copy_capture, pause_process, resume_process, copy_clip } from "./backend";
+import { copy_capture, pause_process, resume_process, copy_clip, delete_clip_locally } from "./backend";
 import * as Toaster from "./toaster";
 import * as SyncStateTracker from "./syncStateTracker";
 import Observable from "../types/observable";
@@ -106,23 +106,42 @@ class SyncTaskQueue extends Observable {
       });
   }
 
-  public async addCapturesSyncTask() {
-    (await SteamClient.Screenshots.GetAllLocalScreenshots()).forEach(screenshot =>
-      this.addScreenshotSyncTask(screenshot.nAppID.toString(), screenshot.hHandle));
-
-    const recordingPath = window.settingsStore.m_ClientSettings.gamerecording_background_path;
-    for (const clip of window.g_GRS.m_clips.keys()) {
-      this.pushTask(async () => await copy_clip(clip, recordingPath))
-        .then((exitCode) => {
-        if (exitCode == 0) {
-          window.g_GRS.m_clips.delete(clip);
-          Logger.info(`Clip ${clip} uploaded and deleted locally`);
-        } else {
-          Logger.error(`Failed to upload clip ${clip}, exit code: ${exitCode}`);
-          Toaster.toast(`Failed to upload clip`);
+  public async addClipSyncTask(clip: string) {
+    const recordingsPath = window.settingsStore.m_ClientSettings.gamerecording_background_path;
+    this.pushTask(async () => await copy_clip(clip, recordingsPath))
+      .then((exitCode) => {
+      if (exitCode == 0) {
+        if (Config.get("capture_delete_after_upload")) {
+          delete_clip_locally(clip, recordingsPath)
+            .then(() => {
+              window.g_GRS.m_clips.delete(clip);
+              Logger.info(`Clip ${clip} uploaded and deleted locally`);
+            })
+            .catch(() => {
+              Logger.warning(`Failed to delete clip ${clip} locally`);
+              Toaster.toast("Failed to delete clip");
+            })
         }
-      });
-    }
+      } else {
+        Logger.error(`Failed to upload clip ${clip}, exit code: ${exitCode}`);
+        Toaster.toast(`Failed to upload clip`);
+      }
+    });
+  }
+
+  public async addCapturesSyncTask() {
+    this.pushTask(async () => {
+      (await SteamClient.Screenshots.GetAllLocalScreenshots()).forEach(screenshot =>
+        this.addScreenshotSyncTask(screenshot.nAppID.toString(), screenshot.hHandle));
+
+      for (const [key, value] of window.g_GRS.m_clips) {
+        if (value.temporary === false) {
+          this.addClipSyncTask(key);
+        }
+      }
+
+      return 0;
+    });
   }
 
   private async pushTask(fn: () => Promise<number>): Promise<number | undefined> {

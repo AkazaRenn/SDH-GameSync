@@ -15,6 +15,7 @@ export default definePlugin(() => {
 
   registrations.push(ApiClient.setupAppLifetimeNotifications());
   registrations.push(ApiClient.setupScreenshotNotification());
+  registrations.push(ApiClient.patchClipsMap());
 
   registrations.push(PluginLogsPage.register());
   registrations.push(ConfigCloudPage.register());

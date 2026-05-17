@@ -80,9 +80,13 @@ class Plugin:
         logger.debug("Executing copy_capture(path=%s), path")
         return await CaptureCopyTarget(path).sync()
 
-    async def copy_clip(self, clip: str, path: str) -> int:
-        logger.debug("Executing copy_clip(clip=%s, path=%s)", clip, path)
-        return await ClipCopyTarget(clip, path).sync()
+    async def copy_clip(self, clip: str, recordings_dir: str) -> int:
+        logger.debug("Executing copy_clip(clip=%s, recordings_dir=%s)", clip, recordings_dir)
+        return await ClipCopyTarget(clip, recordings_dir).sync()
+
+    async def delete_clip_locally(self, clip: str, recordings_dir: str):
+        logger.debug("Executing delete_clip_locally(clip=%s, recordings_dir=%s)", clip, recordings_dir)
+        rmtree(utils.get_clip_dir(clip, recordings_dir))
 
     async def delete_lock_files(self):
         logger.debug("Executing delete_lock_files()")

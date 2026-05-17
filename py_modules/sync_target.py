@@ -346,8 +346,8 @@ class CaptureCopyTarget(SingleFileCopyTarget):
 
 
 class ClipCopyTarget():
-    def __init__(self, clip: str, path: str):
-        self._clip_dir = Path(path) / "clips" / clip
+    def __init__(self, clip: str, recordings_dir: str):
+        self._clip_dir = get_clip_dir(clip, recordings_dir)
         self._clips = combine_clips(self._clip_dir)
         if not self._clips:
             raise ValueError(f"Empty outputs {self._clip_dir}", self._clip_dir)
@@ -362,7 +362,6 @@ class ClipCopyTarget():
             if rc != 0:
                 return rc
 
-        rmtree(self._clip_dir)
         return 0
 
 

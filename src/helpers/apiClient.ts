@@ -1,4 +1,5 @@
 import { AppLifetimeNotification, ScreenshotNotification } from "@decky/ui/dist/globals/steam-client/GameSessions";
+import { afterPatch } from "@decky/ui";
 import { sync_cloud_first, sync_local_first } from "./backend";
 import { GLOBAL_SYNC_APP_ID } from "./commonDefs";
 import Logger from "./logger";
@@ -15,6 +16,27 @@ export function setupScreenshotNotification(): Unregisterable {
       }
     }
   });
+}
+
+export function patchClipsMap(): Unregisterable {
+  let patch = afterPatch(window.g_GRS.m_clips, "set", (args: any[]) => {
+    if (Config.get("capture_upload") &&
+        (args != null) && (args.length > 1) &&
+        (typeof args[0] === "string") &&
+        (args[1].temporary === false)) {
+      if ((!Config.get("sync_in_offline_mode")) && window.App.m_CurrentUser.bIsOfflineMode) {
+        Logger.info("Skip uploading clip in offline mode");
+      } else {
+        SyncTaskQeueue.addClipSyncTask(args[0]);
+      }
+    }
+  });
+
+  return {
+    unregister: () => {
+      patch.unpatch();
+    }
+  };
 }
 
 export function setupAppLifetimeNotifications(): Unregisterable {

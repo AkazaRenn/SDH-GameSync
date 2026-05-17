@@ -218,3 +218,6 @@ def combine_clips(clip_dir: Path) -> list[Path]:
         outputs[0] = output.rename(new_name)
 
     return outputs
+
+def get_clip_dir(clip: str, recordings_dir: str) -> Path:
+    return Path(recordings_dir) / "clips" / clip
