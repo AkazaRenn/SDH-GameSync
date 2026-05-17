@@ -16,7 +16,7 @@ jobs:
 
     steps:
     - name: Checkout
-      uses: actions/checkout@v4
+      uses: actions/checkout@main
       with:
         ref: ${{ github.event.pull_request.head.sha || github.sha }}
         fetch-depth: 0
@@ -45,7 +45,7 @@ jobs:
 
         echo "::endgroup::"
 
-    - uses: pnpm/action-setup@v3
+    - uses: pnpm/action-setup@master
 
     - name: Update pnpm lockfile
       run: |
@@ -65,7 +65,7 @@ jobs:
         unzip -l out/*.zip
 
     - name: Release
-      uses: softprops/action-gh-release@v2
+      uses: softprops/action-gh-release@master
       if: github.event_name == 'push'
       with:
         tag_name: ${{ env.TIMESTAMP }}
@@ -81,7 +81,7 @@ jobs:
         tree out
 
     - name: Upload artifacts
-      uses: actions/upload-artifact@v4
+      uses: actions/upload-artifact@main
       with:
         name: output
         path: out/*/
