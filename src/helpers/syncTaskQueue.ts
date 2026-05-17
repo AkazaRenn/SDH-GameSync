@@ -97,6 +97,7 @@ class SyncTaskQueue extends Observable {
           } catch {
             Logger.warning(`Failed to delete screenshot ${appId}:${screenshotIndex} locally`);
             Toaster.toast("Failed to delete screenshot");
+            return -1;
           }
         }
       } else {
@@ -104,7 +105,7 @@ class SyncTaskQueue extends Observable {
         Toaster.toast(`Failed to upload screenshot`);
       }
 
-      return 0;
+      return exitCode;
     });
   }
 
@@ -126,6 +127,7 @@ class SyncTaskQueue extends Observable {
           } catch {
             Logger.warning(`Failed to delete clip ${clip} locally`);
             Toaster.toast("Failed to delete clip");
+            return -1;
           }
         }
       } else {
@@ -133,7 +135,7 @@ class SyncTaskQueue extends Observable {
         Toaster.toast(`Failed to upload clip`);
       }
 
-      return 0;
+      return exitCode;
     });
   }
 
