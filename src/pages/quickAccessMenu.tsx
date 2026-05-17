@@ -152,7 +152,7 @@ export default function quickAccessMenu() {
                     },
                   })}
             >
-              Upload Destination
+              Upload Destinations
             </ButtonWithIcon>
           </PanelSectionRow>
         </>)}
