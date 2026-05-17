@@ -1,18 +1,49 @@
 import { ReactNode } from "react";
 import { ConfirmModal, showModal, TextField } from "@decky/ui";
 
-export function textInputPopup(title: ReactNode, value: string, onOK: (value: string) => void) {
-  let textFieldValue = value;
+type textInputData = {
+  value: string;
+  set: (value: string) => void;
+};
+
+export function textInputPopup(title: ReactNode, data: textInputData) {
+  let draft = data.value;
 
   showModal(
     <ConfirmModal
       strTitle={title}
-      onOK={() => onOK(textFieldValue)}>
+      onOK={() => data.set(draft)}>
       <TextField
-        defaultValue={value}
+        defaultValue={draft}
         onBlur={(e) => {
-          textFieldValue = e.target.value;
+          draft = e.target.value;
         }} />
+    </ConfirmModal>
+  );
+}
+
+export function multipleTextInputPopup(title: ReactNode, data: Record<string, textInputData>) {
+  const draft: Record<string, string> = Object.fromEntries(
+    Object.entries(data).map(([label, textData]) => [label, textData.value])
+  );
+
+  showModal(
+    <ConfirmModal
+      strTitle={title}
+      onOK={() => {
+        for (const [label, text] of Object.entries(draft)) {
+          data[label]?.set(text);
+        }
+      }}>
+      {Object.keys(data).map((label) => (
+        <TextField
+          label={label}
+          defaultValue={draft[label]}
+          onBlur={(e: any) => {
+            draft[label] = e.target.value;
+          }}
+        />
+      ))}
     </ConfirmModal>
   );
 }

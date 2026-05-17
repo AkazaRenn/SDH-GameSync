@@ -114,9 +114,10 @@ export default function filtersView({ title, description, fullPage = false, getF
                   <IconButton
                     icon={FaPen}
                     onOKActionDescription="Edit"
-                    onClick={() => textInputPopup("Edit Filter",
-                      String(props.entry.label),
-                      (value) => filterEntriesEdit(props.entry.position, value)
+                    onClick={() => textInputPopup("Edit Filter", {
+                      value: String(props.entry.label),
+                      set: (value) => filterEntriesEdit(props.entry.position, value),
+                    }
                     )}
                   />
                 </>)}
@@ -188,9 +189,10 @@ export default function filtersView({ title, description, fullPage = false, getF
               <Row>
                 <DialogButton
                   onClick={() => textInputPopup(
-                    "Add Arbitrary String",
-                    "",
-                    (value: string) => filterEntriesAppend(`${value}`)
+                    "Add Arbitrary String", {
+                      value: "",
+                      set: (value: string) => filterEntriesAppend(`${value}`),
+                    }
                   )}
                 >
                   Add Arbitrary Line

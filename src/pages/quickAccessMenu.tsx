@@ -140,9 +140,17 @@ export default function quickAccessMenu() {
             <ButtonWithIcon
               icon={<FaFileUpload />}
               onClick={() =>
-                Popups.textInputPopup("Captures Upload Destination",
-                  Config.get("capture_upload_destination"),
-                  (e) => Config.set("capture_upload_destination", e))}
+                Popups.multipleTextInputPopup("Captures Upload Destinations",
+                  {
+                    "Screenshots": {
+                      value: Config.get("capture_upload_destination"),
+                      set: (e) => Config.set("capture_upload_destination", e),
+                    },
+                    "Clips": {
+                      value: Config.get("capture_upload_destination_video"),
+                      set: (e) => Config.set("capture_upload_destination_video", e),
+                    },
+                  })}
             >
               Upload Destination
             </ButtonWithIcon>
@@ -223,9 +231,9 @@ export default function quickAccessMenu() {
             <ButtonWithIcon
               icon={<FaCloudArrowUp />}
               onClick={() =>
-                Popups.textInputPopup("Global & Game Sync Root",
-                  Config.get("sync_root"),
-                  (e) => {
+                Popups.textInputPopup("Global & Game Sync Root", {
+                  value: Config.get("sync_root"),
+                  set: (e) => {
                     if (e != Config.get("sync_root")) {
                       if (Config.get("strict_game_sync")) {
                         Popups.confirmPopup("Modify Sync Root",
@@ -240,7 +248,9 @@ export default function quickAccessMenu() {
                         Config.set("sync_root", e);
                       }
                     }
-                  })}
+                  },
+                })
+              }
             >
               Set Sync Root
             </ButtonWithIcon>
@@ -249,9 +259,9 @@ export default function quickAccessMenu() {
             <ButtonWithIcon
               icon={<FaCloudArrowDown />}
               onClick={() =>
-                Popups.textInputPopup("Global & Game Sync Destination",
-                  Config.get("sync_destination"),
-                  (e) => {
+                Popups.textInputPopup("Global & Game Sync Destination", {
+                  value: Config.get("sync_destination"),
+                  set: (e) => {
                     if (e != Config.get("sync_destination")) {
                       if (Config.get("strict_game_sync")) {
                         Popups.confirmPopup("Modify Sync Destination",
@@ -269,7 +279,9 @@ export default function quickAccessMenu() {
                         Config.set("sync_destination", e);
                       }
                     }
-                  })}
+                  },
+                })
+              }
             >
               Set Sync Destination
             </ButtonWithIcon>
