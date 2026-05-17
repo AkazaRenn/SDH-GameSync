@@ -3,6 +3,8 @@ import Observable from "../types/observable";
 import { get_config, set_config } from "./backend";
 import Logger from "./logger";
 
+type ConfigKey = keyof typeof DefaultConfig;
+
 class Config extends Observable {
   private data: Record<string, any> = {};
 
@@ -11,10 +13,11 @@ class Config extends Observable {
     Logger.debug("Config loaded", this.data);
   }
 
-  public get(key: string) {
+
+  public get(key: ConfigKey) {
     let value = this.data[key];
     if (value === undefined) {
-      value = DefaultConfig[key]
+      value = DefaultConfig[key];
       this.set(key, value);
     }
 

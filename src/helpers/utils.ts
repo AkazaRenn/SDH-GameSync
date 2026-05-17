@@ -1,6 +1,7 @@
 import { GLOBAL_SYNC_APP_ID, SHARED_FILTER_APP_ID } from "./commonDefs";
 import { update_rclone } from "./backend";
 import * as Toaster from "./toaster";
+import Logger from "./logger";
 
 export function getAppName(appId: number): string {
   if (appId == GLOBAL_SYNC_APP_ID) {
@@ -20,4 +21,19 @@ export function updateRclone(toast: boolean = false) {
   update_rclone()
     .then(() => toast && Toaster.toast("Rclone is now the latest"))
     .catch(() => Toaster.toast("Error updating rclone"));
+}
+
+export function retry(handler: () => void, delayMs: number) {
+  try {
+    handler();
+  } catch (error: any) {
+    Logger.warning("Failure, retry in", delayMs, "ms, error:", error);
+    setTimeout(() => {
+      try {
+        handler();
+      } catch (error: any) {
+        Logger.error("Failure in retry, error:", error)
+      }
+    }, delayMs);
+  }
 }

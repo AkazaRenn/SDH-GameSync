@@ -1,7 +1,7 @@
 import { LuArrowDownUp } from "react-icons/lu";
 import { definePlugin } from "@decky/api";
 import { PLUGIN_NAME } from "./helpers/commonDefs";
-import { updateRclone } from "./helpers/utils";
+import { updateRclone, retry } from "./helpers/utils";
 import * as ApiClient from "./helpers/apiClient";
 import * as Clipboard from "./helpers/clipboard";
 import PluginLogsPage from "./pages/pluginLogsPage";
@@ -9,25 +9,20 @@ import ConfigCloudPage from "./pages/configCloudPage";
 import SyncTargetConfigPage from "./pages/syncTargetConfigPage";
 import ContextMenuPatch from "./helpers/contextMenuPatch";
 import QuickAccessMenu from "./pages/quickAccessMenu";
-import Logger from "./helpers/logger";
 
 export default definePlugin(() => {
+  const retryDelayMs = 5000;
   const registrations: Array<Unregisterable> = [];
 
-  registrations.push(ApiClient.setupAppLifetimeNotifications());
-  registrations.push(ApiClient.setupScreenshotNotification());
+  retry(() => registrations.push(ApiClient.setupAppLifetimeNotifications()), retryDelayMs);
+  retry(() => registrations.push(ApiClient.setupScreenshotNotification()), retryDelayMs);
+  retry(() => registrations.push(ApiClient.patchClipsMap()), retryDelayMs);
 
-  registrations.push(PluginLogsPage.register());
-  registrations.push(ConfigCloudPage.register());
-  registrations.push(SyncTargetConfigPage.register());
+  retry(() => registrations.push(PluginLogsPage.register()), retryDelayMs);
+  retry(() => registrations.push(ConfigCloudPage.register()), retryDelayMs);
+  retry(() => registrations.push(SyncTargetConfigPage.register()), retryDelayMs);
 
-  registrations.push(ContextMenuPatch.register());
-
-  // Delay patching the clips map, it may not be available immediately when Steam is loaded
-  setTimeout(() => {
-    registrations.push(ApiClient.patchClipsMap());
-    Logger.info("Clips map patched successfully");
-  }, 5000);
+  retry(() => registrations.push(ContextMenuPatch.register()), retryDelayMs);
 
   updateRclone();
 

@@ -87,49 +87,58 @@ class SyncTaskQueue extends Observable {
   }
 
   public async addScreenshotSyncTask(appId: string, screenshotIndex: number) {
-    this.pushTask(async () => await copy_capture(await SteamClient.Screenshots.GetLocalScreenshotPath(appId, screenshotIndex)))
-      .then((exitCode) => {
-        if (exitCode == 0) {
-          if (Config.get("capture_delete_after_upload")) {
-            SteamClient.Screenshots.DeleteLocalScreenshot(appId, screenshotIndex)
-              .then(() =>
-                Logger.info(`Screenshot ${appId}:${screenshotIndex} uploaded and deleted locally`))
-              .catch(() => {
-                Logger.warning(`Failed to delete screenshot ${appId}:${screenshotIndex} locally`);
-                Toaster.toast("Failed to delete screenshot");
-              })
+    this.pushTask(async () => {
+      let exitCode = await copy_capture(await SteamClient.Screenshots.GetLocalScreenshotPath(appId, screenshotIndex));
+      if (exitCode == 0) {
+        if (Config.get("capture_delete_after_upload")) {
+          try {
+            await SteamClient.Screenshots.DeleteLocalScreenshot(appId, screenshotIndex);
+            Logger.info(`Screenshot ${appId}:${screenshotIndex} uploaded and deleted locally`);
+          } catch {
+            Logger.warning(`Failed to delete screenshot ${appId}:${screenshotIndex} locally`);
+            Toaster.toast("Failed to delete screenshot");
           }
-        } else {
-          Logger.error(`Failed to upload screenshot ${appId}:${screenshotIndex}, exit code: ${exitCode}`);
-          Toaster.toast(`Failed to upload screenshot`);
         }
-      });
+      } else {
+        Logger.error(`Failed to upload screenshot ${appId}:${screenshotIndex}, exit code: ${exitCode}`);
+        Toaster.toast(`Failed to upload screenshot`);
+      }
+
+      return 0;
+    });
   }
 
   public async addClipSyncTask(clip: string) {
     const recordingsPath = window.settingsStore.m_ClientSettings.gamerecording_background_path;
-    this.pushTask(async () => await copy_clip(clip, recordingsPath))
-      .then((exitCode) => {
+    this.pushTask(async () => {
+      // Avoid duplication caused by clipping in Media page
+      if (!window.g_GRS.m_clips.has(clip)) {
+        return 0;
+      }
+
+      let exitCode = await copy_clip(clip, recordingsPath);
       if (exitCode == 0) {
         if (Config.get("capture_delete_after_upload")) {
-          delete_clip_locally(clip, recordingsPath)
-            .then(() => {
-              window.g_GRS.m_clips.delete(clip);
-              Logger.info(`Clip ${clip} uploaded and deleted locally`);
-            })
-            .catch(() => {
-              Logger.warning(`Failed to delete clip ${clip} locally`);
-              Toaster.toast("Failed to delete clip");
-            })
+          try {
+            await delete_clip_locally(clip, recordingsPath);
+            window.g_GRS.m_clips.delete(clip);
+            Logger.info(`Clip ${clip} uploaded and deleted locally`);
+          } catch {
+            Logger.warning(`Failed to delete clip ${clip} locally`);
+            Toaster.toast("Failed to delete clip");
+          }
         }
       } else {
         Logger.error(`Failed to upload clip ${clip}, exit code: ${exitCode}`);
         Toaster.toast(`Failed to upload clip`);
       }
+
+      return 0;
     });
   }
 
   public async addCapturesSyncTask() {
+    // Use pushTask here to make sure the captures list are up-to-date
     this.pushTask(async () => {
       (await SteamClient.Screenshots.GetAllLocalScreenshots()).forEach(screenshot =>
         this.addScreenshotSyncTask(screenshot.nAppID.toString(), screenshot.hHandle));
