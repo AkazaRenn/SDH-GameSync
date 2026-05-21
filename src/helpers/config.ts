@@ -24,7 +24,7 @@ class Config extends Observable {
     return this.data[key];
   }
 
-  public set(key: string, value: any) {
+  public set(key: ConfigKey, value: any) {
     this.data[key] = value;
     set_config(key, value);
     this.emit(key, value);
