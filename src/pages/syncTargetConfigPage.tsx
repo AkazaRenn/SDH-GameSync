@@ -1,6 +1,7 @@
 import { ReactNode, useEffect, useState } from "react";
+import { IoMdUnlock } from "react-icons/io";
 import { IoArrowUpCircle, IoArrowDownCircle } from "react-icons/io5";
-import { FaCloudArrowUp, FaCloudArrowDown, FaLockOpen } from "react-icons/fa6";
+import { FaCloudArrowUp, FaCloudArrowDown } from "react-icons/fa6";
 import { Navigation, SidebarNavigation, useParams } from "@decky/ui";
 import { GLOBAL_SYNC_APP_ID } from "../helpers/commonDefs";
 import { getAppName } from "../helpers/utils";
@@ -86,7 +87,7 @@ class SyncTargetConfigPage extends RoutePage<SyncTargetConfigPageParams> {
               {(appId == GLOBAL_SYNC_APP_ID) && (
                 <>
                   <IconButton
-                    icon={FaLockOpen}
+                    icon={IoMdUnlock}
                     onOKActionDescription="Delete Lock Files"
                     disabled={syncInProgress}
                     onClick={() => confirmPopup(
