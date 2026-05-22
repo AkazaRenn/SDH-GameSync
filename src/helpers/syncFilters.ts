@@ -4,25 +4,25 @@ import Logger from "./logger";
 import Observable from "../types/observable";
 
 class SyncFilters extends Observable {
-  public readonly events = {
+  readonly events = {
     UPDATE: "update",
     SET: "set",
   }
 
   private appIdSet: Set<number> = new Set();
 
-  public async refresh(): Promise<void> {
+  async refresh(): Promise<void> {
     let availableSyncFilters = await get_available_filters();
     Logger.debug("Available sync filters:", availableSyncFilters);
     this.appIdSet = new Set(availableSyncFilters);
     this.emit(this.events.UPDATE);
   }
 
-  public has(appId: number): boolean {
+  has(appId: number): boolean {
     return this.appIdSet.has(appId);
   }
 
-  public async get(appId: number): Promise<Array<string>> {
+  async get(appId: number): Promise<Array<string>> {
     if (appId == SHARED_FILTER_APP_ID) {
       return await get_shared_filters();
     } else {
@@ -30,7 +30,7 @@ class SyncFilters extends Observable {
     }
   }
 
-  public async set(appId: number, filters: Array<string>): Promise<void> {
+  async set(appId: number, filters: Array<string>): Promise<void> {
     if (appId == SHARED_FILTER_APP_ID) {
       await set_shared_filters(filters);
     } else {

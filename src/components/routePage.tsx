@@ -25,12 +25,12 @@ export default abstract class RoutePage<T extends { [K in keyof T]: string } = R
     return () => routerHook.removeRoute(route);
   }
 
-  public enter = (params: T): void => {
+  enter = (params: T): void => {
     const route = this.baseRoute + this.params.map((param) => `/${params[param as keyof T]}`).join("");
     Logger.debug(`Navigating to ${route}`)
     Navigation.Navigate(route);
     Navigation.CloseSideMenus();
   }
 
-  public abstract render(): ReactNode;
+  abstract render(): ReactNode;
 }

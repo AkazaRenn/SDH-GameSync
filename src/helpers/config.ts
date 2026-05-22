@@ -8,13 +8,13 @@ type ConfigKey = keyof typeof DefaultConfig;
 class Config extends Observable {
   private data: Record<string, any> = {};
 
-  public async load(): Promise<void> {
+  async load(): Promise<void> {
     this.data = await get_config() as Record<string, any>;
     Logger.debug("Config loaded", this.data);
   }
 
 
-  public get(key: ConfigKey) {
+  get(key: ConfigKey) {
     let value = this.data[key];
     if (value === undefined) {
       value = DefaultConfig[key];
@@ -24,7 +24,7 @@ class Config extends Observable {
     return this.data[key];
   }
 
-  public set(key: ConfigKey, value: any) {
+  set(key: ConfigKey, value: any) {
     this.data[key] = value;
     set_config(key, value);
     this.emit(key, value);

@@ -19,7 +19,7 @@ export function setupScreenshotNotification(): Unregisterable {
 }
 
 export function patchClipsMap(): Unregisterable {
-  let patch = afterPatch(window.g_GRS.m_clips, "set", (args: any[]) => {
+  let patch = afterPatch(window.g_GRS.m_clips, "set", async (args: any[]) => {
     if (Config.get("capture_upload") &&
         (args != null) && (args.length > 1) &&
         (typeof args[0] === "string") &&
@@ -27,7 +27,7 @@ export function patchClipsMap(): Unregisterable {
       if ((!Config.get("sync_in_offline_mode")) && window.App.m_CurrentUser.bIsOfflineMode) {
         Logger.info("Skip uploading clip in offline mode");
       } else {
-        SyncTaskQeueue.addClipSyncTask(args[0]);
+        await SyncTaskQeueue.addClipSyncTask(args[0]);
       }
     }
   });

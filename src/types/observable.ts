@@ -1,7 +1,7 @@
 export default class Observable {
   readonly eventTarget = new EventTarget();
 
-  public on(eventType: string, handler: (arg: any) => void): Unregisterable {
+  on(eventType: string, handler: (arg: any) => void): Unregisterable {
     const eventListener = ((event: CustomEvent) => handler(event.detail)) as EventListener;
     this.eventTarget.addEventListener(eventType, eventListener);
 

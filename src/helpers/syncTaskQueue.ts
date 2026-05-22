@@ -20,14 +20,14 @@ async function worker(fn: () => Promise<number>): Promise<number | undefined> {
 }
 
 class SyncTaskQueue extends Observable {
-  public readonly events = {
+  readonly events = {
     BUSY: 'busy',
     FAIL_TOAST_CLICK: 'failToastClick',
   }
 
   private readonly queue: queueAsPromised<any>;
 
-  public constructor() {
+  constructor() {
     super();
     this.queue = fastq.promise(worker, 1)
     this.queue.drain = () => {
@@ -36,11 +36,11 @@ class SyncTaskQueue extends Observable {
     };
   }
 
-  public get busy() {
+  get busy() {
     return (!this.queue.idle());
   }
 
-  public async addSyncTask(syncFunction: (appId: number) => Promise<number>, appId: number, gameRunning?: boolean, pId?: number) {
+  async addSyncTask(syncFunction: (appId: number) => Promise<number>, appId: number, gameRunning?: boolean, pId?: number) {
     if (!SyncFilters.has(appId)) {
       return;
     }
@@ -86,7 +86,7 @@ class SyncTaskQueue extends Observable {
     }
   }
 
-  public async addScreenshotSyncTask(appId: string, screenshotIndex: number) {
+  async addScreenshotSyncTask(appId: string, screenshotIndex: number) {
     this.pushTask(async () => {
       let exitCode = await copy_capture(await SteamClient.Screenshots.GetLocalScreenshotPath(appId, screenshotIndex));
       if (exitCode == 0) {
@@ -109,7 +109,7 @@ class SyncTaskQueue extends Observable {
     });
   }
 
-  public async addClipSyncTask(clip: string) {
+  async addClipSyncTask(clip: string) {
     const recordingsPath = window.settingsStore.m_ClientSettings.gamerecording_background_path;
     this.pushTask(async () => {
       // Avoid duplication caused by clipping in Media page
@@ -139,7 +139,7 @@ class SyncTaskQueue extends Observable {
     });
   }
 
-  public async addCapturesSyncTask() {
+  async addCapturesSyncTask() {
     // Use pushTask here to make sure the captures list are up-to-date
     this.pushTask(async () => {
       (await SteamClient.Screenshots.GetAllLocalScreenshots()).forEach(screenshot =>
