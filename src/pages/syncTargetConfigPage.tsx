@@ -1,10 +1,10 @@
 import { ReactNode, useEffect, useState } from "react";
 import { IoArrowUpCircle, IoArrowDownCircle } from "react-icons/io5";
-import { FaCloudArrowUp, FaCloudArrowDown } from "react-icons/fa6";
+import { FaCloudArrowUp, FaCloudArrowDown, FaLockOpen } from "react-icons/fa6";
 import { Navigation, SidebarNavigation, useParams } from "@decky/ui";
 import { GLOBAL_SYNC_APP_ID } from "../helpers/commonDefs";
 import { getAppName } from "../helpers/utils";
-import { get_last_sync_log, sync_local_first, sync_cloud_first, resync_local_first, resync_cloud_first } from "../helpers/backend";
+import { get_last_sync_log, sync_local_first, sync_cloud_first, resync_local_first, resync_cloud_first, delete_lock_files } from "../helpers/backend";
 import { confirmPopup } from "../components/popups";
 import * as Toaster from "../helpers/toaster";
 import RoutePage from "../components/routePage";
@@ -86,6 +86,26 @@ class SyncTargetConfigPage extends RoutePage<SyncTargetConfigPageParams> {
               {(appId == GLOBAL_SYNC_APP_ID) && (
                 <>
                   <IconButton
+                    icon={FaLockOpen}
+                    onOKActionDescription="Delete Lock Files"
+                    disabled={syncInProgress}
+                    onClick={() => confirmPopup(
+                      "Delete Lock Files",
+                      <span>
+                        Delete lock files when the prior sync is interrupted without proper cleanup.<br /><br />
+                        Click "Confirm" to continue.
+                      </span>,
+                      () => {
+                        delete_lock_files().then(() => {
+                          Toaster.toast("Lock files deleted");
+                        }).catch((e) => {
+                          Logger.error(`Failed to delete lock files: ${e}`);
+                          Toaster.toast("Failed to delete lock files");
+                        });
+                      }
+                    )}>
+                  </IconButton>
+                  <IconButton
                     icon={IoArrowUpCircle}
                     onOKActionDescription="Resync (Local First)"
                     disabled={syncInProgress}
@@ -95,7 +115,7 @@ class SyncTargetConfigPage extends RoutePage<SyncTargetConfigPageParams> {
                         Starting resync, this may take some time.<br /><br />
                         Click "Confirm" to continue.
                       </span>,
-                      () => SyncTaskQueue.addSyncTask(async _ => await resync_local_first(), GLOBAL_SYNC_APP_ID)
+                      () => SyncTaskQueue.addSyncTask(resync_local_first, GLOBAL_SYNC_APP_ID)
                     )}>
                   </IconButton>
                   <IconButton
@@ -108,7 +128,7 @@ class SyncTargetConfigPage extends RoutePage<SyncTargetConfigPageParams> {
                         Starting resync, this may take some time.<br /><br />
                         Click "Confirm" to continue.
                       </span>,
-                      () => SyncTaskQueue.addSyncTask(async _ => await resync_cloud_first(), GLOBAL_SYNC_APP_ID)
+                      () => SyncTaskQueue.addSyncTask(resync_cloud_first, GLOBAL_SYNC_APP_ID)
                     )}>
                   </IconButton>
                 </>)}

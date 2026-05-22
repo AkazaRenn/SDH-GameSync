@@ -41,41 +41,39 @@ class SyncTaskQueue extends Observable {
   }
 
   async addSyncTask(syncFunction: (appId: number) => Promise<number>, appId: number, gameRunning?: boolean, pId?: number) {
-    if (!SyncFilters.has(appId)) {
-      return;
-    }
-
-    if (pId) {
-      await pause_process(pId);
-    }
-
-    if ((!gameRunning) || SyncStateTracker.getInSync(appId)) {
-      this.pushTask(async () => syncFunction(appId))
-        .then((exitCode) => {
-          if (exitCode == 0 || exitCode == 6) {
-            Logger.info(`Sync for "${appId}" finished`);
-          } else {
-            Logger.error(`Sync for for ${appId} failed with exit code ${exitCode}`);
-            Toaster.toast(`Sync failed, click to see the errors`, 5000, () => {
-              this.emit(this.events.FAIL_TOAST_CLICK, appId)
-            });
-          }
-        })
-        .finally(() => {
-          if (pId) {
-            resume_process(pId);
-          }
-          if (gameRunning != undefined) {
-            // in sync only when game is not running
-            SyncStateTracker.setInSync(appId, !gameRunning);
-          }
-        });
-    } else {
+    if (SyncFilters.has(appId)) {
       if (pId) {
-        resume_process(pId);
+        await pause_process(pId);
       }
-      Logger.warning(`Skipping download sync for ${appId} due to missing upload sync`);
-      Toaster.toast("Skipping download sync");
+
+      if ((!gameRunning) || SyncStateTracker.getInSync(appId)) {
+        this.pushTask(async () => syncFunction(appId))
+          .then((exitCode) => {
+            if (exitCode == 0 || exitCode == 6) {
+              Logger.info(`Sync for "${appId}" finished`);
+            } else {
+              Logger.error(`Sync for for ${appId} failed with exit code ${exitCode}`);
+              Toaster.toast(`Sync failed, click to see the errors`, 5000, () => {
+                this.emit(this.events.FAIL_TOAST_CLICK, appId)
+              });
+            }
+          })
+          .finally(() => {
+            if (pId) {
+              resume_process(pId);
+            }
+            if (gameRunning != undefined) {
+              // in sync only when game is not running
+              SyncStateTracker.setInSync(appId, !gameRunning);
+            }
+          });
+      } else {
+        if (pId) {
+          resume_process(pId);
+        }
+        Logger.warning(`Skipping download sync for ${appId} due to missing upload sync`);
+        Toaster.toast("Skipping download sync");
+      }
     }
 
     // To avoid uploading the same screenshots repeatedly.

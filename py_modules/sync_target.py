@@ -357,7 +357,7 @@ class ClipCopyTarget():
         for clip in self._clips:
             logger.debug("Copying clip %s", clip)
             rc = await SingleFileCopyTarget(str(clip), destination).sync()
-            clip.unlink()
+            clip.unlink(missing_ok=True)
 
             if rc != 0:
                 return rc
