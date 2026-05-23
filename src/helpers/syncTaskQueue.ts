@@ -90,18 +90,14 @@ class SyncTaskQueue extends Observable {
       let exitCode = await copy_capture(await SteamClient.Screenshots.GetLocalScreenshotPath(appId, screenshotIndex));
       if (exitCode == 0) {
         if (Config.get("capture_delete_after_upload")) {
-          try {
-            await SteamClient.Screenshots.DeleteLocalScreenshot(appId, screenshotIndex);
-            Logger.info(`Screenshot ${appId}:${screenshotIndex} uploaded and deleted locally`);
-          } catch {
-            Logger.warning(`Failed to delete screenshot ${appId}:${screenshotIndex} locally`);
-            Toaster.toast("Failed to delete screenshot");
-            return -1;
-          }
+          await SteamClient.Screenshots.DeleteLocalScreenshot(appId, screenshotIndex);
+          Logger.info(`Screenshot ${appId}:${screenshotIndex} uploaded and deleted locally`);
+        } else {
+          Logger.info("Screenshot", `${appId}:${screenshotIndex}`, "uploaded");
         }
       } else {
-        Logger.error(`Failed to upload screenshot ${appId}:${screenshotIndex}, exit code: ${exitCode}`);
-        Toaster.toast(`Failed to upload screenshot`);
+        Logger.error("Upload screenshot", `${appId}:${screenshotIndex}` ,"failure:", exitCode);
+        Toaster.toast("Failed to upload screenshot");
       }
 
       return exitCode;
@@ -109,32 +105,35 @@ class SyncTaskQueue extends Observable {
   }
 
   async addClipSyncTask(clip: string) {
-    const recordingsPath = window.settingsStore.m_ClientSettings.gamerecording_background_path;
     this.pushTask(async () => {
       // Avoid duplication caused by clipping in Media page
       if (!window.g_GRS.m_clips.has(clip)) {
         return 0;
       }
 
-      let exitCode = await copy_clip(clip, recordingsPath);
+      let clipPath = `/tmp/${clip}.mp4`;
+
+      let exportResult = await window.g_GRS.ExportClip(clip, clipPath, {}, false);
+      if (exportResult != EResult.OK) {
+        Logger.error("Export clip", clip, "failure:", exportResult);
+        return exportResult;
+      }
+
+      let exitCode = await copy_clip(clipPath);
       if (exitCode == 0) {
         if (Config.get("capture_delete_after_upload")) {
-          try {
-            let result = await window.g_GRS.DeleteClip(clip);
-            if (result != EResult.OK) {
-              Logger.error("Delete clip failure:", result);
-              throw Error;
-            }
-            Logger.info(`Clip ${clip} uploaded and deleted locally`);
-          } catch {
-            Logger.warning(`Failed to delete clip ${clip} locally`);
-            Toaster.toast("Failed to delete clip");
-            return -1;
+          let deleteResult = await window.g_GRS.DeleteClip(clip);
+          if (deleteResult != EResult.OK) {
+            Logger.error("Delete clip", clip, "failure:", deleteResult);
+            return deleteResult;
           }
+          Logger.info("Clip", clip, "uploaded and deleted locally");
+        } else {
+          Logger.info("Clip", clip, "uploaded");
         }
       } else {
-        Logger.error(`Failed to upload clip ${clip}, exit code: ${exitCode}`);
-        Toaster.toast(`Failed to upload clip`);
+        Logger.error("Upload clip", clip, "failure:", exitCode);
+        Toaster.toast("Failed to upload clip");
       }
 
       return exitCode;

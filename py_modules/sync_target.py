@@ -345,24 +345,20 @@ class CaptureCopyTarget(SingleFileCopyTarget):
         super().__init__(screenshot_path, Config.get_config_item("capture_upload_destination"))
 
 
-class ClipCopyTarget():
-    def __init__(self, clip: str, recordings_dir: str):
-        self._clip_dir = get_clip_dir(clip, recordings_dir)
-        self._clips = combine_clips(self._clip_dir)
-        if not self._clips:
-            raise ValueError(f"Empty outputs {self._clip_dir}", self._clip_dir)
+class ClipCopyTarget(SingleFileCopyTarget):
+    def __init__(self, clip_path: str):
+        super().__init__(clip_path, Config.get_config_item("capture_upload_destination_video"))
 
-    async def sync(self) -> int:
-        destination = Config.get_config_item("capture_upload_destination_video")
-        for clip in self._clips:
-            logger.debug("Copying clip %s", clip)
-            rc = await SingleFileCopyTarget(str(clip), destination).sync()
-            clip.unlink(missing_ok=True)
+    async def sync(self, winner: RcloneSyncWinner = RcloneSyncWinner.LOCAL) -> int:
+        """
+        Call sync and delete the clip file, given that it should be temporary.
 
-            if rc != 0:
-                return rc
-
-        return 0
+        Returns:
+        int: Exit code of the rclone sync process if it runs, -1 if it cannot run.
+        """
+        result = await super().sync(winner)
+        self._file_path.unlink(missing_ok=True)
+        return result
 
 
 def get_sync_target(app_id: int) -> _SyncTarget:
