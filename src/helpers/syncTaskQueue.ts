@@ -1,6 +1,6 @@
 import fastq from "fastq";
 import type { queueAsPromised } from "fastq";
-import { copy_capture, pause_process, resume_process, copy_clip, delete_clip_locally } from "./backend";
+import { copy_capture, pause_process, resume_process, copy_clip } from "./backend";
 import * as Toaster from "./toaster";
 import * as SyncStateTracker from "./syncStateTracker";
 import Observable from "../types/observable";
@@ -8,6 +8,7 @@ import Logger from "./logger"
 import Config from "./config";
 import SyncFilters from "./syncFilters";
 import { GLOBAL_SYNC_APP_ID } from "./commonDefs";
+import { EResult } from "@decky/ui";
 
 async function worker(fn: () => Promise<number>): Promise<number | undefined> {
   try {
@@ -119,8 +120,11 @@ class SyncTaskQueue extends Observable {
       if (exitCode == 0) {
         if (Config.get("capture_delete_after_upload")) {
           try {
-            await delete_clip_locally(clip, recordingsPath);
-            window.g_GRS.m_clips.delete(clip);
+            let result = await window.g_GRS.DeleteClip(clip);
+            if (result != EResult.OK) {
+              Logger.error("Delete clip failure:", result);
+              throw Error;
+            }
             Logger.info(`Clip ${clip} uploaded and deleted locally`);
           } catch {
             Logger.warning(`Failed to delete clip ${clip} locally`);

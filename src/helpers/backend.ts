@@ -22,7 +22,6 @@ export const resync_local_first = callable<[], number>("resync_local_first");
 export const resync_cloud_first = callable<[], number>("resync_cloud_first");
 export const copy_capture = callable<[path: string], number>("copy_capture");
 export const copy_clip = callable<[name: string, recordings_dir: string], number>("copy_clip");
-export const delete_clip_locally = callable<[name: string, recordings_dir: string], number>("delete_clip_locally");
 export const delete_lock_files = callable<[], void>("delete_lock_files");
 
 // Processes

@@ -1,3 +1,5 @@
+import { EResult } from "@decky/ui";
+
 declare global {
   interface Window {
     NotificationStore: any;
@@ -8,6 +10,7 @@ declare global {
     };
     g_GRS: {
       m_clips: Map<string, any>;
+      DeleteClip(clip_id: string): Promise<EResult>;
     };
   }
 
