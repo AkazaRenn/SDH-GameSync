@@ -87,19 +87,25 @@ class SyncTaskQueue extends Observable {
 
   async addScreenshotSyncTask(appId: string, screenshotIndex: number) {
     this.pushTask(async () => {
+      let screenshot = `${appId}:${screenshotIndex}`;
+
       let exitCode = await copy_capture(await SteamClient.Screenshots.GetLocalScreenshotPath(appId, screenshotIndex));
-      if (exitCode == 0) {
-        if (Config.get("capture_delete_after_upload")) {
-          await SteamClient.Screenshots.DeleteLocalScreenshot(appId, screenshotIndex);
-          Logger.info(`Screenshot ${appId}:${screenshotIndex} uploaded and deleted locally`);
-        } else {
-          Logger.info("Screenshot", `${appId}:${screenshotIndex}`, "uploaded");
-        }
-      } else {
-        Logger.error("Upload screenshot", `${appId}:${screenshotIndex}` ,"failure:", exitCode);
+      if (exitCode != 0) {
+        Logger.error("Upload screenshot", screenshot ,"failure:", exitCode);
         Toaster.toast("Failed to upload screenshot");
       }
 
+      if (!Config.get("capture_delete_after_upload")) {
+        Logger.info("Screenshot", screenshot, "uploaded");
+        return exitCode
+      }
+
+      if (!await SteamClient.Screenshots.DeleteLocalScreenshot(appId, screenshotIndex)) {
+        Logger.warning("Delete screenshot", screenshot, "failure");
+        return -1;
+      }
+
+      Logger.info("Screenshot", screenshot, "uploaded and deleted locally");
       return exitCode;
     });
   }
@@ -120,22 +126,24 @@ class SyncTaskQueue extends Observable {
       }
 
       let exitCode = await copy_clip(clipPath);
-      if (exitCode == 0) {
-        if (Config.get("capture_delete_after_upload")) {
-          let deleteResult = await window.g_GRS.DeleteClip(clip);
-          if (deleteResult != EResult.OK) {
-            Logger.error("Delete clip", clip, "failure:", deleteResult);
-            return deleteResult;
-          }
-          Logger.info("Clip", clip, "uploaded and deleted locally");
-        } else {
-          Logger.info("Clip", clip, "uploaded");
-        }
-      } else {
+      if (exitCode != 0) {
         Logger.error("Upload clip", clip, "failure:", exitCode);
         Toaster.toast("Failed to upload clip");
+        return exitCode;
       }
 
+      if (!Config.get("capture_delete_after_upload")) {
+        Logger.info("Clip", clip, "uploaded");
+        return exitCode
+      }
+
+      let deleteResult = await window.g_GRS.DeleteClip(clip);
+      if (deleteResult != EResult.OK) {
+        Logger.warning("Delete clip", clip, "failure:", deleteResult);
+        return deleteResult;
+      }
+
+      Logger.info("Clip", clip, "uploaded and deleted locally");
       return exitCode;
     });
   }
