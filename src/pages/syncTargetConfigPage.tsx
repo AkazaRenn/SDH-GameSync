@@ -116,7 +116,7 @@ class SyncTargetConfigPage extends RoutePage<SyncTargetConfigPageParams> {
                         Starting resync, this may take some time.<br /><br />
                         Click "Confirm" to continue.
                       </span>,
-                      () => SyncTaskQueue.addSyncTask(resync_local_first, GLOBAL_SYNC_APP_ID)
+                      () => SyncTaskQueue.addSyncTask(() => resync_local_first(), GLOBAL_SYNC_APP_ID)
                     )}>
                   </IconButton>
                   <IconButton
@@ -129,7 +129,7 @@ class SyncTargetConfigPage extends RoutePage<SyncTargetConfigPageParams> {
                         Starting resync, this may take some time.<br /><br />
                         Click "Confirm" to continue.
                       </span>,
-                      () => SyncTaskQueue.addSyncTask(resync_cloud_first, GLOBAL_SYNC_APP_ID)
+                      () => SyncTaskQueue.addSyncTask(() => resync_cloud_first(), GLOBAL_SYNC_APP_ID)
                     )}>
                   </IconButton>
                 </>)}
