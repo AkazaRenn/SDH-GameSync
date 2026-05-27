@@ -93,6 +93,7 @@ class SyncTaskQueue extends Observable {
       if (exitCode != 0) {
         Logger.error("Upload screenshot", screenshot ,"failure:", exitCode);
         Toaster.toast("Failed to upload screenshot");
+        return exitCode;
       }
 
       if (!Config.get("capture_delete_after_upload")) {
