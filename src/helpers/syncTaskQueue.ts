@@ -98,7 +98,7 @@ class SyncTaskQueue extends Observable {
 
       if (!Config.get("capture_delete_after_upload")) {
         Logger.info("Screenshot", screenshot, "uploaded");
-        return exitCode
+        return exitCode;
       }
 
       if (!await SteamClient.Screenshots.DeleteLocalScreenshot(appId, screenshotIndex)) {
@@ -135,7 +135,7 @@ class SyncTaskQueue extends Observable {
 
       if (!Config.get("capture_delete_after_upload")) {
         Logger.info("Clip", clip, "uploaded");
-        return exitCode
+        return exitCode;
       }
 
       let deleteResult = await window.g_GRS.DeleteClip(clip);
