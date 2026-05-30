@@ -133,11 +133,12 @@ export default function filtersView({ title, description, fullPage = false, getF
         <div style={{
           display: "flex",
           flexDirection: "column",
-          gap: "20px",
           paddingTop: "8px",
           paddingBottom: "20px",
-        }}
-        >
+          paddingLeft: "8px",
+          paddingRight: "8px",
+          gap: "4px",
+        }}>
           <Row>
             <FilterPickerButton
               text="Add Include Filter"

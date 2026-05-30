@@ -16,9 +16,9 @@ export default function iconButton({ icon: Icon, onOKActionDescription, disabled
       onClick={onClick}
       style={{
         height: "28px",
-        width: "40px",
+        width: "28px",
         minWidth: 0,
-        padding: "10px 12px",
+        padding: "10px 6px",
       }}
     >
       <Icon style={{

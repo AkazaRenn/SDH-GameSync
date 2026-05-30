@@ -21,14 +21,14 @@ export default function pageView({ title, description, titleItem, fullPage = tru
   const styles: CSSProperties= fullPage
     ? {
       ...baseStyles,
-      margin: "40px 20px",
+      margin: "40px 0",
     }
     : {
       ...baseStyles,
-      width: "calc(100% - 36px)",
+      width: "100%",
       marginTop: "-24px",
+      marginLeft: "-24px",
       position: "fixed",
-      paddingRight: "36px",
     };
 
   const HeadingTag = fullPage ? 'h1' : 'h2';

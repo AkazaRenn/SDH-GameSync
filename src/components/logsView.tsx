@@ -50,6 +50,8 @@ export default function LogsView({ title, fullPage = true, getLog, children }: P
           lineHeight: "1.2em",
           maxHeight: "calc(100% - 1px)",
           margin: "0",
+          paddingLeft: "8px",
+          paddingRight: "8px",
         }}>
         {logContent}
       </pre>
