@@ -13,6 +13,7 @@ export default function row({ children }: PropsWithChildren) {
               display: "flex",
               gap: "4px",
               width: "100%",
+              alignItems: "center",
             }}>
             {children}
           </div>} />

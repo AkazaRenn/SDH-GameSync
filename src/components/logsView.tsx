@@ -48,7 +48,7 @@ export default function LogsView({ title, fullPage = true, getLog, children }: P
           wordBreak: 'break-word',
           fontSize: "smaller",
           lineHeight: "1.2em",
-          maxHeight: "calc(100% - 1px)",
+          maxHeight: "75vh",
           margin: "0",
           paddingLeft: "8px",
           paddingRight: "8px",
