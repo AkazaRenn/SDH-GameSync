@@ -14,24 +14,29 @@ import IconButton from "./iconButton";
 
 interface FiltersViewProps {
   description?: ReactNode;
-  getFiltersFunction: () => Promise<Array<string>>;
-  setFiltersFunction: (filters: Array<string>) => Promise<void>;
+  initialFilters: Array<string>;
+  setFiltersFunction: (filters: Array<string>) => void;
+  saveFiltersFunction: (filters: Array<string>) => Promise<void>;
 }
 
-export default function filtersView({ description, getFiltersFunction, setFiltersFunction: setFiltersFunction, children }: PropsWithChildren<FiltersViewProps>) {
+export default function filtersView({ description, initialFilters = [], saveFiltersFunction, setFiltersFunction, children }: PropsWithChildren<FiltersViewProps>) {
   const saveButtonRef = useRef<HTMLDivElement>(null);
 
   const [filterEntries, setFilterEntries] = useState<Array<ReorderableEntry<void>>>([]);
   const [showAdvancedOptions, setShowAdvancedOptions] = useState<boolean>(Config.get("advanced_mode"));
 
   useEffect(() => {
-    getFiltersFunction().then(filterEntriesFromArray);
+    filterEntriesFromArray(initialFilters);
     const registrations: Array<Unregisterable> = [];
     registrations.push(Config.on("advanced_mode", setShowAdvancedOptions));
     return () => {
       registrations.forEach(e => e.unregister());
     }
   }, []);
+
+  useEffect(() => {
+    setFiltersFunction(filterEntriesToArray());
+  }, [filterEntries]);
 
   const filterEntriesToArray = (): Array<string> => {
     return filterEntries
@@ -198,7 +203,7 @@ export default function filtersView({ description, getFiltersFunction, setFilter
         )}
         <Row>
           <DialogButton
-            onClick={() => setFiltersFunction(filterEntriesToArray())}
+            onClick={() => saveFiltersFunction(filterEntriesToArray())}
             ref={saveButtonRef}
             style={{ backgroundColor: CSS_STEAM_HIGHLIGHT_COLOR }}
             onGamepadFocus={() => saveButtonRef.current && (saveButtonRef.current.style.backgroundColor = "white")}

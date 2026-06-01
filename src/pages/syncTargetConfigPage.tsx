@@ -3,7 +3,7 @@ import { IoMdUnlock } from "react-icons/io";
 import { IoArrowUpCircle, IoArrowDownCircle } from "react-icons/io5";
 import { FaCloudArrowUp, FaCloudArrowDown } from "react-icons/fa6";
 import { Navigation, SidebarNavigation, useParams } from "@decky/ui";
-import { GLOBAL_SYNC_APP_ID } from "../helpers/commonDefs";
+import { GLOBAL_SYNC_APP_ID, SHARED_FILTER_APP_ID } from "../helpers/commonDefs";
 import { getAppName } from "../helpers/utils";
 import { get_last_sync_log, sync_local_first, sync_cloud_first, resync_local_first, resync_cloud_first, delete_lock_files } from "../helpers/backend";
 import { confirmPopup } from "../components/popups";
@@ -11,7 +11,6 @@ import * as Toaster from "../helpers/toaster";
 import RoutePage from "../components/routePage";
 import LogsView from "../components/logsView";
 import FiltersView from "../components/filtersView";
-import SharedFiltersView from "../components/sharedFiltersView";
 import Logger from "../helpers/logger";
 import SyncTaskQueue from "../helpers/syncTaskQueue";
 import IconButton from "../components/iconButton";
@@ -47,7 +46,13 @@ class SyncTargetConfigPage extends RoutePage<SyncTargetConfigPageParams> {
     const appName = getAppName(appId);
 
     const [syncInProgress, setSyncInProgress] = useState<boolean>(SyncTaskQueue.busy);
+    const [targetFilters, setTargetFilters] = useState<string[]>([]);
+    const [sharedFilters, setSharedFilters] = useState<string[]>([]);
+
     useEffect(() => {
+      SyncFilters.get(appId).then(setTargetFilters);
+      SyncFilters.get(SHARED_FILTER_APP_ID).then(setSharedFilters);
+
       const registrations: Array<Unregisterable> = [];
 
       registrations.push(SyncTaskQueue.on(SyncTaskQueue.events.BUSY, setSyncInProgress));
@@ -66,7 +71,7 @@ class SyncTargetConfigPage extends RoutePage<SyncTargetConfigPageParams> {
         } else {
           Toaster.toast("Filter Saved");
         }
-      }))
+      }));
 
       return () => registrations.forEach(e => e.unregister());
     }, []);
@@ -139,8 +144,9 @@ class SyncTargetConfigPage extends RoutePage<SyncTargetConfigPageParams> {
           content:
             <FiltersView
               description={<>Filters specific for <i>{appName}</i> sync. It will be used together with the shared filter, but has a lower priority.</>}
-              getFiltersFunction={() => SyncFilters.get(appId)}
-              setFiltersFunction={(filters) => SyncFilters.set(appId, filters)}
+              initialFilters={targetFilters}
+              setFiltersFunction={setTargetFilters}
+              saveFiltersFunction={(filters) => SyncFilters.set(appId, filters)}
             >
               <IconButton
                 icon={FaCloudArrowUp}
@@ -160,8 +166,11 @@ class SyncTargetConfigPage extends RoutePage<SyncTargetConfigPageParams> {
           title: "Shared Filter",
           visible: true,
           content:
-            <SharedFiltersView
+            <FiltersView
               description="Filters that's shared among all syncs. It will be used together with the target filter, but has a higher priority."
+              initialFilters={sharedFilters}
+              setFiltersFunction={setSharedFilters}
+              saveFiltersFunction={(filters) => SyncFilters.set(SHARED_FILTER_APP_ID, filters)}
             />
         },
       ]}
