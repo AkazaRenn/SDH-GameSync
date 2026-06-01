@@ -4,12 +4,11 @@ import PageView from "./pageView";
 import IconButton from "./iconButton";
 
 interface LogsViewProps {
-  title: string;
-  fullPage: boolean;
+  title?: string;
   getLog: () => Promise<string>;
 }
 
-export default function LogsView({ title, fullPage = true, getLog, children }: PropsWithChildren<LogsViewProps>) {
+export default function LogsView({ title, getLog, children }: PropsWithChildren<LogsViewProps>) {
   const [logContent, setLogContent] = useState('');
   const logPreRef = useRef<HTMLPreElement>(null);
 
@@ -27,7 +26,7 @@ export default function LogsView({ title, fullPage = true, getLog, children }: P
   return (
     <PageView
       title={title}
-      titleItem={<>
+      actionItems={<>
         {children}
         <IconButton
           icon={IoMdRefresh}
@@ -35,7 +34,6 @@ export default function LogsView({ title, fullPage = true, getLog, children }: P
           onClick={() => getLog().then(e => setLogContent(e))}
         />
       </>}
-      fullPage={fullPage}
     >
       <pre
         ref={logPreRef}

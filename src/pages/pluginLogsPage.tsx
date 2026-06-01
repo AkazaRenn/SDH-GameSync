@@ -7,7 +7,10 @@ class PluginLogsPage extends RoutePage {
   readonly route = "plugin-logs";
 
   render(): ReactNode {
-    return <LogsView title="Plugin Logs" fullPage={true} getLog={get_plugin_log} />;
+    return <LogsView
+      title="Plugin Logs"
+      getLog={get_plugin_log}
+    />;
   }
 }
 

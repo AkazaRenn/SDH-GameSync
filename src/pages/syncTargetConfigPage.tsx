@@ -76,13 +76,10 @@ class SyncTargetConfigPage extends RoutePage<SyncTargetConfigPageParams> {
         {
           title: "Sync Logs",
           // icon: <FaFileAlt />,
-          hideTitle: true,
           visible: true,
           content:
             <LogsView
-              title="Sync Logs"
               getLog={async () => await get_last_sync_log(appId)}
-              fullPage={false}
             >
               {(appId == GLOBAL_SYNC_APP_ID) && (
                 <>
@@ -138,13 +135,10 @@ class SyncTargetConfigPage extends RoutePage<SyncTargetConfigPageParams> {
         "separator",
         {
           title: "Target Filter",
-          hideTitle: true,
           visible: true,
           content:
             <FiltersView
-              title="Target Filter"
               description={<>Filters specific for <i>{appName}</i> sync. It will be used together with the shared filter, but has a lower priority.</>}
-              fullPage={false}
               getFiltersFunction={() => SyncFilters.get(appId)}
               setFiltersFunction={(filters) => SyncFilters.set(appId, filters)}
             >
@@ -164,13 +158,10 @@ class SyncTargetConfigPage extends RoutePage<SyncTargetConfigPageParams> {
         },
         {
           title: "Shared Filter",
-          hideTitle: true,
           visible: true,
           content:
             <SharedFiltersView
-              title="Shared Filter"
               description="Filters that's shared among all syncs. It will be used together with the target filter, but has a higher priority."
-              fullPage={false}
             />
         },
       ]}

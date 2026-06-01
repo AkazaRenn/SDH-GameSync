@@ -11,3 +11,5 @@ export const CONTEXT_MENU_GAME_FILTER_KEY: string = `${PLUGIN_NAME_AS_PATH}-filt
 export const CLIPBOARD_KEY: string = `${PLUGIN_NAME_AS_PATH}-clipboard`;
 
 export const CSS_STEAM_HIGHLIGHT_COLOR: string = "#1A9FFE";
+export const CSS_BPM_TOP_BAR_HEIGHT: string = "40px";
+export const CSS_BPM_BOTTOM_BAR_HEIGHT: string = "40px";

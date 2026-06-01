@@ -13,14 +13,12 @@ import Row from "./row";
 import IconButton from "./iconButton";
 
 interface FiltersViewProps {
-  title: string;
   description?: ReactNode;
-  fullPage: boolean;
   getFiltersFunction: () => Promise<Array<string>>;
   setFiltersFunction: (filters: Array<string>) => Promise<void>;
 }
 
-export default function filtersView({ title, description, fullPage = false, getFiltersFunction, setFiltersFunction: setFiltersFunction, children }: PropsWithChildren<FiltersViewProps>) {
+export default function filtersView({ description, getFiltersFunction, setFiltersFunction: setFiltersFunction, children }: PropsWithChildren<FiltersViewProps>) {
   const saveButtonRef = useRef<HTMLDivElement>(null);
 
   const [filterEntries, setFilterEntries] = useState<Array<ReorderableEntry<void>>>([]);
@@ -85,10 +83,8 @@ export default function filtersView({ title, description, fullPage = false, getF
 
   return (
     <PageView
-      title={title}
       description={description}
-      fullPage={fullPage}
-      titleItem={children}
+      actionItems={children}
     >
       <ReorderableList
         onSave={setFilterEntries}
