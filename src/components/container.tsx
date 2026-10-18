@@ -1,5 +1,6 @@
 import { PropsWithChildren } from "react";
 import { CSS_BPM_BOTTOM_BAR_HEIGHT, CSS_BPM_TOP_BAR_HEIGHT } from "../helpers/commonDefs";
+import Row from "./row";
 
 interface ContainerProps {
   title?: React.ReactNode;
@@ -24,17 +25,18 @@ export default function container({ title, description, actionItems, children }:
       }}>
         {description}
       </div>}
-      {children}
       <div style={{
         display: "flex",
-        flexDirection: "column",
         gap: "4px",
-        position: "fixed",
-        bottom: `calc(${CSS_BPM_BOTTOM_BAR_HEIGHT} + 4px)`,
-        right: "4px",
+        position: "absolute",
+        top: `calc(${CSS_BPM_TOP_BAR_HEIGHT} + 24px)`,
+        right: "32px",
       }}>
-        {actionItems}
+        <Row>
+          {actionItems}
+        </Row>
       </div>
+      {children}
     </>
   )
 }
