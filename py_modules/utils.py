@@ -70,8 +70,8 @@ def send_signal(pid: int, signal: signal.Signals):
         for child_pid in child_pids:
             send_signal(child_pid, signal)
 
-    except Exception as e:
-        logger.warning("Error sending signal %s to process %d: %s", signal.name, pid, e)
+    except Exception:
+        logger.exception("Error sending signal %s to process %d", signal.name, pid)
 
 
 def test_syncpath(syncpath: str) -> int:

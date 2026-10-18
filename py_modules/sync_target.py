@@ -42,8 +42,8 @@ class _SyncTarget:
         ONGOING_SYNCS.add(self._id)
         try:
             sync_result = await sync_task()
-        except Exception as e:
-            logger.error("Error during sync: %s", e)
+        except Exception:
+            logger.exception("Error during sync")
             sync_result = -1
         ONGOING_SYNCS.discard(self._id)
         return sync_result
@@ -103,9 +103,9 @@ class _SyncTarget:
         try:
             with self._rclone_log_path.open() as f:
                 return f.read()
-        except Exception as e:
-            err_msg = f'Error reading log file "{self._rclone_log_path}":\n{e}'
-            logger.error(err_msg)
+        except Exception:
+            err_msg = f'Error reading log file "{self._rclone_log_path}"'
+            logger.exception(err_msg)
             return err_msg
 
     def _get_sync_paths(

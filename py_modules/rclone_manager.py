@@ -107,8 +107,8 @@ class RcloneManager:
             with RCLONE_CFG_PATH.open("r") as f:
                 l = f.readlines()
                 return l[1].strip().split(" ")[-1]
-        except Exception as e:
-            logger.warning("Failed to get cloud type from rclone config: %s", e)
+        except Exception:
+            logger.exception("Failed to get cloud type from rclone config")
 
         return ""
 
@@ -123,7 +123,9 @@ class RcloneManager:
         logger.info("Current version: %s", current_version)
 
         if latest_version > current_version:
-            logger.info("Updating rclone from %s to %s", current_version, latest_version)
+            logger.info(
+                "Updating rclone from %s to %s", current_version, latest_version
+            )
             cls._get_rclone()
             return
 
@@ -140,11 +142,19 @@ class RcloneManager:
         """
         url = "https://downloads.rclone.org/version.txt"
         try:
-            with urllib.request.urlopen(url, context=ssl_context) as response:
+            request = urllib.request.Request(url, headers=USER_AGENT)
+            with urllib.request.urlopen(request, context=ssl_context) as response:
                 if response.status == 200:
-                    return Version(response.read().decode("utf-8").strip().split(' ')[-1])
-        except Exception as e:
-            logger.warning(f"Failed to fetch the latest version of rclone: {e}")
+                    return Version(
+                        response.read().decode("utf-8").strip().split(" ")[-1]
+                    )
+        except urllib.error.HTTPError as e:
+            logger.error(f"HTTP Error: {e.code}")
+            logger.error(f"Reason: {e.reason}")
+            body = e.read().decode("utf-8", errors="replace")
+            logger.error(f"Response body: {body}")
+        except Exception:
+            logger.exception("Failed to fetch the latest version of rclone")
 
         return DEFAULT_VERSION
 
@@ -172,7 +182,7 @@ class RcloneManager:
         pattern = re.compile(rb"rclone v[\d\.]+")
         for line in lines:
             if re.search(pattern, line):
-                return Version(line.decode().strip().split(' ')[-1])
+                return Version(line.decode().strip().split(" ")[-1])
 
         logger.warning("Failed to extract the current version of rclone")
         return DEFAULT_VERSION
@@ -183,7 +193,8 @@ class RcloneManager:
         Downloads the latest version of rclone and replaces the current version.
         """
         download_url = "https://downloads.rclone.org/rclone-current-linux-amd64.zip"
-        with urllib.request.urlopen(download_url, context=ssl_context) as response:
+        request = urllib.request.Request(download_url, headers=USER_AGENT)
+        with urllib.request.urlopen(request, context=ssl_context) as response:
             if response.status == 200:
                 import io, zipfile
 

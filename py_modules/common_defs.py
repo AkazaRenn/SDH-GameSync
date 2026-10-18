@@ -24,6 +24,7 @@ SYNC_FILTER_TYPE_DICT = {
 }
 
 DEFAULT_VERSION = Version("0")
+USER_AGENT = {"User-Agent": "SDH-GameSync rclone updater"}
 
 logger = decky.logger
 ssl_context = ssl.create_default_context(cafile=certifi.where())

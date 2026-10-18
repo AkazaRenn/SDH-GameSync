@@ -1,5 +1,5 @@
 import { PropsWithChildren } from "react";
-import { CSS_BPM_BOTTOM_BAR_HEIGHT, CSS_BPM_TOP_BAR_HEIGHT } from "../helpers/commonDefs";
+import { CSS_BPM_TOP_BAR_HEIGHT } from "../helpers/commonDefs";
 import Row from "./row";
 
 interface ContainerProps {
