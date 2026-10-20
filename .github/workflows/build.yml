@@ -10,4 +10,4 @@ on:
 jobs:
   build:
     name: Build plugin
-    uses: AkazaRenn/SteamDeckHomebrew-Actions/build.yml@main
+    uses: AkazaRenn/SteamDeckHomebrew-Actions/.github/workflows/build.yml@main
