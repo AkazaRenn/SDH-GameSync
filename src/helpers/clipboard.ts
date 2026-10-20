@@ -1,6 +1,6 @@
 import { CLIPBOARD_KEY } from "./commonDefs";
 
-let timeout: NodeJS.Timeout | undefined = undefined;
+let timeout: number | undefined = undefined;
 
 function unsetTimeout() {
   if (timeout) {
