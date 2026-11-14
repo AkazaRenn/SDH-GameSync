@@ -1,0 +1,143 @@
+import type { Translations } from "../index";
+
+// French locale. Missing keys fall back to English.
+// Use normal spaces before ? ! : ; % » and after «: they are made non-breaking at runtime.
+const fr: Translations = {
+  // Common
+  "common.confirmToContinue": "Cliquez sur « Confirmer » pour continuer.",
+
+  // App names
+  "app.global": "globale",
+  "app.shared": "partagée",
+
+  // Notifications
+  "toast.syncFailed": "Échec de la synchronisation, cliquez pour voir les erreurs",
+  "toast.skippingDownloadSync": "Synchronisation de téléchargement ignorée",
+  "toast.screenshotUploadFailed": "Échec de l’envoi de la capture d’écran",
+  "toast.clipUploadFailed": "Échec de l’envoi du clip",
+  "toast.rcloneUpdated": "Rclone est à jour",
+  "toast.rcloneUpdateFailed": "Erreur lors de la mise à jour de rclone",
+  "toast.syncFinished": "Synchro terminée",
+  "toast.invalidAppId": "appId invalide pour la page de configuration de la synchronisation",
+  "toast.filterSaved": "Filtre enregistré",
+  "toast.lockFilesDeleted": "Fichiers de verrouillage supprimés",
+  "toast.lockFilesDeleteFailed": "Échec de la suppression des fichiers de verrouillage",
+  "toast.pathNotInSyncRoot": "Chemin invalide : il n’est pas dans la racine de synchronisation",
+  "toast.copied": "Copié dans le presse-papiers",
+  "toast.filtersCopied": "Filtres copiés dans le presse-papiers",
+  "toast.filtersPasted": "Filtres collés depuis le presse-papiers",
+  "toast.clipboardEmpty": "Le presse-papiers est vide",
+
+  // Context menu
+  "contextMenu.syncLogsAndFilters": "Journaux et filtres de synchro",
+
+  // File picker
+  "filePicker.filterType": "Type de filtre",
+  "filePicker.file": "Fichier",
+  "filePicker.folder": "Dossier",
+  "filePicker.folderNoRecurse": "Dossier (sans les sous-dossiers)",
+  "filePicker.rootTitle": "ÊTES-VOUS SÛR ?",
+  "filePicker.rootText": "Le répertoire racine va être ajouté à la liste des filtres. {{warning}}",
+  "filePicker.rootWarning": "Synchroniser avec un tel filtre amène rclone à tenter d’envoyer, voire de supprimer, l’intégralité du système de fichiers.",
+  "filePicker.rootConfirm": "Si vous êtes sûr à 100 % de ce que vous faites, cliquez sur « Confirmer » pour continuer.",
+  "filePicker.matches": "Le chemin {{path}} correspond à {{count}} fichier(s).",
+  "filePicker.tooMany": "beaucoup, beaucoup trop de",
+
+  // Filters view
+  "filters.copy": "Copier",
+  "filters.edit": "Modifier",
+  "filters.remove": "Supprimer",
+  "filters.editTitle": "Modifier le filtre",
+  "filters.addInclude": "Ajouter un filtre d’inclusion",
+  "filters.addExclude": "Ajouter un filtre d’exclusion",
+  "filters.copyAll": "Copier tout le filtre",
+  "filters.pasteAppend": "Coller le filtre (ajouter)",
+  "filters.pasteReplace": "Coller le filtre (remplacer)",
+  "filters.addArbitraryTitle": "Ajouter une chaîne libre",
+  "filters.addArbitrary": "Ajouter une ligne libre",
+  "filters.deleteAll": "Tout supprimer",
+  "filters.save": "Enregistrer",
+
+  // Logs view
+  "logs.refresh": "Actualiser les journaux",
+  "logs.pluginLogs": "Journaux du plugin",
+
+  // Cloud provider page
+  "cloud.pageTitle": "Configurer le service cloud",
+  "cloud.currentlyUsing": "Service actuel : {{provider}}",
+  "cloud.none": "Aucun",
+  "cloud.other": "Autre : {{type}}",
+  "cloud.chooseProvider": "Sélectionnez l’un des services ci-dessous pour configurer la destination de sauvegarde",
+  "cloud.googleDrive": "Google Drive (peut ne pas fonctionner si Google ne fait pas confiance au navigateur Steam)",
+  "cloud.otherButton": "Autre (avancé)",
+  "cloud.otherTitle": "Ajouter d’autres services",
+  "cloud.otherText1": "En plus des services ci-dessus, d’autres peuvent être configurés. Malheureusement, leur configuration n’est possible qu’en mode Bureau.",
+  "cloud.otherText2": "Consultez la documentation de configuration de rclone ({{link}}) pour plus d’informations.",
+  "cloud.otherText3": "Dans ce cas, nommez le remote « cloud ».",
+  "cloud.createFolderTitle": "Créer le dossier de synchronisation dans le cloud ?",
+  "cloud.createFolderText1": "Si vous avez correctement configuré le service cloud, il est temps de créer le dossier de destination {{folder}} dans le cloud pour la synchronisation.",
+  "cloud.createFolderText2": "Pour cela, cliquez sur « Confirmer ».",
+  "cloud.createFolderText3": "Si vous avez d’autres projets, vous pouvez fermer cette fenêtre en cliquant sur « Annuler ».",
+
+  // Quick access menu
+  "qam.sync": "Synchronisation",
+  "qam.startGlobalSync": "Lancer la synchro globale",
+  "qam.setupGlobalFilterFirst": "Configurez d’abord le filtre de synchronisation globale via le bouton « Filtres de la synchro globale ».",
+  "qam.syncOnGameStart": "Synchro au lancement",
+  "qam.syncOnGameStop": "Synchro à la fermeture",
+  "qam.syncInOfflineMode": "Synchro hors ligne",
+  "qam.captures": "Captures",
+  "qam.uploadCaptures": "Envoyer les captures",
+  "qam.deleteLocalCopy": "Supprimer la copie locale",
+  "qam.uploadOnGlobalSync": "Envoyer à la synchro globale",
+  "qam.uploadDestinationsTitle": "Destinations d’envoi des captures",
+  "qam.screenshots": "Captures d’écran",
+  "qam.clips": "Clips",
+  "qam.uploadDestinations": "Destinations d’envoi",
+  "qam.configuration": "Configuration",
+  "qam.globalSyncFilters": "Filtres de la synchro globale",
+  "qam.cloudProvider": "Service cloud",
+  "qam.advancedMode": "Mode avancé",
+  "qam.enable": "Activer",
+  "qam.enableAdvancedModeTitle": "Activer le mode avancé",
+  "qam.advancedModeText": "Le mode avancé est réservé à ceux qui savent ce qu’ils font.",
+  "qam.advancedModeWarning": "Utiliser les options de ce mode sans précaution peut entraîner une perte de données irrécupérable !",
+  "qam.strictGameSync": "Synchro stricte des jeux",
+  "qam.enableStrictGameSyncTitle": "Activer la synchronisation stricte des jeux",
+  "qam.strictGameSyncText": "Rclone passera du mode « COPY » au mode « SYNC » pour la synchronisation des jeux, ce qui lui permet de {{deleteAnyFiles}} sur la destination (locale/cloud) pour qu’elle corresponde à la source (cloud/locale).",
+  "qam.deleteAnyFiles": "SUPPRIMER N’IMPORTE QUEL FICHIER",
+  "qam.syncRootTitle": "Racine de synchronisation globale et des jeux",
+  "qam.modifySyncRootTitle": "Modifier la racine de synchronisation",
+  "qam.modifySyncRootText": "Vous modifiez la racine de synchronisation alors que la « Synchro stricte des jeux » est activée.",
+  "qam.setSyncRoot": "Définir la racine de synchro",
+  "qam.syncDestinationTitle": "Destination de synchronisation globale et des jeux",
+  "qam.modifySyncDestinationTitle": "Modifier la destination de synchronisation",
+  "qam.modifySyncDestinationText": "Vous modifiez la destination de synchronisation alors que la « Synchro stricte des jeux » est activée.",
+  "qam.setSyncDestination": "Définir la destination de synchro",
+  "qam.dataAlignedWarning": "Assurez-vous que toutes les données sont identiques en local et dans le cloud, sinon elles risquent d’être perdues, voire {{fullyDeleted}} !",
+  "qam.fullyDeleted": "entièrement supprimées",
+  "qam.updateRclone": "Mettre à jour rclone",
+
+  // Sync target page
+  "target.syncLogs": "Journaux de synchro",
+  "target.deleteLockFiles": "Supprimer les fichiers de verrouillage",
+  "target.deleteLockFilesText": "Supprime les fichiers de verrouillage lorsque la synchronisation précédente a été interrompue sans nettoyage correct.",
+  "target.resyncLocalFirst": "Resynchroniser (local d’abord)",
+  "target.resyncCloudFirst": "Resynchroniser (cloud d’abord)",
+  "target.resyncText": "Lancement de la resynchronisation, cela peut prendre un certain temps.",
+  "target.strictFilterSavedText": "La synchronisation stricte des jeux étant activée, modifier le filtre peut amener la prochaine synchronisation de téléchargement (au lancement du jeu) à supprimer des données. Pour l’éviter, il est vivement recommandé de lancer dès maintenant une synchronisation d’envoi (comme à la fermeture du jeu) afin d’aligner les données.",
+  "target.strictFilterSavedQuestion": "Voulez-vous lancer une synchronisation d’envoi maintenant ?",
+  "target.syncNow": "Synchroniser",
+  "target.skip": "Ignorer",
+  "target.targetFilter": "Filtre cible",
+  "target.targetFilterDescription": "Filtres spécifiques à la synchronisation de {{app}}. Ils sont utilisés avec le filtre partagé, mais ont une priorité plus basse.",
+  "target.globalFilterDescription": "Filtres spécifiques à la synchronisation {{app}}. Ils sont utilisés avec le filtre partagé, mais ont une priorité plus basse.",
+  "target.sharedFilter": "Filtre partagé",
+  "target.sharedFilterDescription": "Filtres partagés par toutes les synchronisations. Ils sont utilisés avec le filtre cible, mais ont une priorité plus haute.",
+  "target.syncNowLocalFirst": "Synchroniser (local d’abord)",
+  "target.syncNowUpload": "Synchroniser (envoi)",
+  "target.syncNowCloudFirst": "Synchroniser (cloud d’abord)",
+  "target.syncNowDownload": "Synchroniser (réception)",
+};
+
+export default fr;

@@ -2,6 +2,7 @@ import { useEffect, useState, useRef, PropsWithChildren } from "react";
 import { IoMdRefresh } from "react-icons/io";
 import PageView from "./pageView";
 import IconButton from "./iconButton";
+import { t } from "../i18n";
 
 interface LogsViewProps {
   title?: string;
@@ -30,7 +31,7 @@ export default function LogsView({ title, getLog, children }: PropsWithChildren<
         {children}
         <IconButton
           icon={IoMdRefresh}
-          onOKActionDescription="Refresh logs"
+          onOKActionDescription={t("logs.refresh")}
           onClick={() => getLog().then(e => setLogContent(e))}
         />
       </>}

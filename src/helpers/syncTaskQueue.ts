@@ -9,6 +9,7 @@ import Config from "./config";
 import SyncFilters from "./syncFilters";
 import { GLOBAL_SYNC_APP_ID } from "./commonDefs";
 import { EResult } from "@decky/ui";
+import { t } from "../i18n";
 
 async function worker(fn: () => Promise<number>): Promise<number | undefined> {
   try {
@@ -54,7 +55,7 @@ class SyncTaskQueue extends Observable {
               Logger.info(`Sync for "${appId}" finished`);
             } else {
               Logger.error(`Sync for for ${appId} failed with exit code ${exitCode}`);
-              Toaster.toast(`Sync failed, click to see the errors`, 5000, () => {
+              Toaster.toast(t("toast.syncFailed"), 5000, () => {
                 this.emit(this.events.FAIL_TOAST_CLICK, appId)
               });
             }
@@ -73,7 +74,7 @@ class SyncTaskQueue extends Observable {
           resume_process(pId);
         }
         Logger.warning(`Skipping download sync for ${appId} due to missing upload sync`);
-        Toaster.toast("Skipping download sync");
+        Toaster.toast(t("toast.skippingDownloadSync"));
       }
     }
 
@@ -92,7 +93,7 @@ class SyncTaskQueue extends Observable {
       let exitCode = await copy_capture(await SteamClient.Screenshots.GetLocalScreenshotPath(appId, screenshotIndex));
       if (exitCode != 0) {
         Logger.error("Upload screenshot", screenshot ,"failure:", exitCode);
-        Toaster.toast("Failed to upload screenshot");
+        Toaster.toast(t("toast.screenshotUploadFailed"));
         return exitCode;
       }
 
@@ -129,7 +130,7 @@ class SyncTaskQueue extends Observable {
       let exitCode = await copy_clip(clipPath);
       if (exitCode != 0) {
         Logger.error("Upload clip", clip, "failure:", exitCode);
-        Toaster.toast("Failed to upload clip");
+        Toaster.toast(t("toast.clipUploadFailed"));
         return exitCode;
       }
 

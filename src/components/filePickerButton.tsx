@@ -5,6 +5,7 @@ import { test_syncpath } from "../helpers/backend";
 import { reduceSlashes } from "../helpers/utils";
 import * as Toaster from "../helpers/toaster";
 import Config from "../helpers/config";
+import { t, tx } from "../i18n";
 
 const enum PathPostfix {
   FILE = "",
@@ -22,13 +23,13 @@ export default function filterPickerButton({ text, onConfirm }: FilterPickerButt
     const fullPath = path + postfix;
 
     if (!path.startsWith(Config.get("sync_root"))) {
-      Toaster.toast("Invalid, path not in sync root");
+      Toaster.toast(t("toast.pathNotInSyncRoot"));
     } else if (path === "/") {
       confirmPopup(
-        <b>ARE YOU SURE?</b>,
+        <b>{t("filePicker.rootTitle")}</b>,
         <span>
-          It will add the root directory to the filter list. <b>Syncing with such a filter makes rclone try to upload or even delete the whole file system.</b><br /><br />
-          If you are 100% sure what you are doing, click "Confirm" to continue.
+          {tx("filePicker.rootText", { warning: <b>{t("filePicker.rootWarning")}</b> })}<br /><br />
+          {t("filePicker.rootConfirm")}
         </span>,
         () => onConfirm(fullPath)
       );
@@ -36,8 +37,8 @@ export default function filterPickerButton({ text, onConfirm }: FilterPickerButt
       test_syncpath(fullPath).then(e => confirmPopup(
         text,
         <span>
-          Path <i>{fullPath}</i> matches <b>{e >= 0 ? e : "tooooooo many"}</b> file(s).<br /><br />
-          Click "Confirm" to continue.
+          {tx("filePicker.matches", { path: <i>{fullPath}</i>, count: <b>{e >= 0 ? e : t("filePicker.tooMany")}</b> })}<br /><br />
+          {t("common.confirmToContinue")}
         </span>,
         () => onConfirm("/" + reduceSlashes(fullPath.slice(Config.get("sync_root").length)))
       ))
@@ -47,14 +48,14 @@ export default function filterPickerButton({ text, onConfirm }: FilterPickerButt
   return (
     <DialogButton
       onClick={() => showContextMenu(
-        <Menu label="Filter Type">
+        <Menu label={t("filePicker.filterType")}>
           <MenuItem
             onSelected={() =>
               openFilePicker(FileSelectionType.FILE, Config.get("sync_root"), true)
                 .then(e => onFilePicked(e.path, PathPostfix.FILE))
             }
           >
-            File
+            {t("filePicker.file")}
           </MenuItem>
           <MenuItem
             onSelected={() =>
@@ -62,7 +63,7 @@ export default function filterPickerButton({ text, onConfirm }: FilterPickerButt
                 .then((e) => onFilePicked(e.path, PathPostfix.FOLDER))
             }
           >
-            Folder
+            {t("filePicker.folder")}
           </MenuItem>
           <MenuItem
             onSelected={() =>
@@ -70,7 +71,7 @@ export default function filterPickerButton({ text, onConfirm }: FilterPickerButt
                 .then((e) => onFilePicked(e.path, PathPostfix.FOLDER_NORECURSE))
             }
           >
-            Folder (without Subfolders)
+            {t("filePicker.folderNoRecurse")}
           </MenuItem>
         </Menu>
       )}

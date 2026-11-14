@@ -14,6 +14,7 @@ import {
 import { CONTEXT_MENU_GAME_FILTER_KEY as CONTEXT_MENU_SYNC_FILTER_KEY } from "./commonDefs";
 import SyncTargetConfigPage from "../pages/syncTargetConfigPage";
 import Registeration from '../types/registeration';
+import { t } from '../i18n';
 
 // Always add before "Properties..."
 const spliceArtworkItem = (children: any[], appid: number) => {
@@ -27,7 +28,7 @@ const spliceArtworkItem = (children: any[], appid: number) => {
       onSelected: () => {
         SyncTargetConfigPage.enter({ appId: String(appid) });
       },
-      children: "Sync Logs & Filters"
+      children: t("contextMenu.syncLogsAndFilters")
     })
   ));
 };

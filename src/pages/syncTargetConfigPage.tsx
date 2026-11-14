@@ -17,6 +17,7 @@ import SyncTaskQueue from "../helpers/syncTaskQueue";
 import IconButton from "../components/iconButton";
 import SyncFilters from "../helpers/syncFilters";
 import Config from "../helpers/config";
+import { t, tx } from "../i18n";
 
 interface SyncTargetConfigPageParams {
   appId: string;
@@ -39,7 +40,7 @@ class SyncTargetConfigPage extends RoutePage<SyncTargetConfigPageParams> {
     const appId = Number(useParams<SyncTargetConfigPageParams>().appId);
     if (isNaN(appId)) {
       Logger.error(`Invalid appId for sync target config page: ${useParams<SyncTargetConfigPageParams>().appId}`);
-      Toaster.toast("Invalid appId for sync target config page");
+      Toaster.toast(t("toast.invalidAppId"));
       Navigation.NavigateBack();
       return;
     }
@@ -54,17 +55,17 @@ class SyncTargetConfigPage extends RoutePage<SyncTargetConfigPageParams> {
       registrations.push(SyncFilters.on(SyncFilters.events.SET, (appId: number) => {
         if ((appId > GLOBAL_SYNC_APP_ID) && Config.get("strict_game_sync")) {
           confirmPopup(
-            "Filter Saved",
+            t("toast.filterSaved"),
             <span>
-              Since you have enabled Strict Game Sync, modifying the filter may cause the next download sync (on game start) to delete some data. To avoid that, it is highly recommended to trigger an upload sync (on game stop) right now to get data into sync.<br /><br />
-              Do you want to trigger an upload sync right now?
+              {t("target.strictFilterSavedText")}<br /><br />
+              {t("target.strictFilterSavedQuestion")}
             </span>,
             () => SyncTaskQueue.addSyncTask(sync_local_first, appId),
-            "Sync Now",
-            "Skip"
+            t("target.syncNow"),
+            t("target.skip")
           )
         } else {
-          Toaster.toast("Filter Saved");
+          Toaster.toast(t("toast.filterSaved"));
         }
       }))
 
@@ -74,7 +75,7 @@ class SyncTargetConfigPage extends RoutePage<SyncTargetConfigPageParams> {
     return <SidebarNavigation
       pages={[
         {
-          title: "Sync Logs",
+          title: t("target.syncLogs"),
           // icon: <FaFileAlt />,
           visible: true,
           content:
@@ -85,46 +86,46 @@ class SyncTargetConfigPage extends RoutePage<SyncTargetConfigPageParams> {
                 <>
                   <IconButton
                     icon={IoMdUnlock}
-                    onOKActionDescription="Delete Lock Files"
+                    onOKActionDescription={t("target.deleteLockFiles")}
                     disabled={syncInProgress}
                     onClick={() => confirmPopup(
-                      "Delete Lock Files",
+                      t("target.deleteLockFiles"),
                       <span>
-                        Delete lock files when the prior sync is interrupted without proper cleanup.<br /><br />
-                        Click "Confirm" to continue.
+                        {t("target.deleteLockFilesText")}<br /><br />
+                        {t("common.confirmToContinue")}
                       </span>,
                       () => {
                         delete_lock_files().then(() => {
-                          Toaster.toast("Lock files deleted");
+                          Toaster.toast(t("toast.lockFilesDeleted"));
                         }).catch((e) => {
                           Logger.error(`Failed to delete lock files: ${e}`);
-                          Toaster.toast("Failed to delete lock files");
+                          Toaster.toast(t("toast.lockFilesDeleteFailed"));
                         });
                       }
                     )}>
                   </IconButton>
                   <IconButton
                     icon={IoArrowUpCircle}
-                    onOKActionDescription="Resync (Local First)"
+                    onOKActionDescription={t("target.resyncLocalFirst")}
                     disabled={syncInProgress}
                     onClick={() => confirmPopup(
-                      "Resync (Local First)",
+                      t("target.resyncLocalFirst"),
                       <span>
-                        Starting resync, this may take some time.<br /><br />
-                        Click "Confirm" to continue.
+                        {t("target.resyncText")}<br /><br />
+                        {t("common.confirmToContinue")}
                       </span>,
                       () => SyncTaskQueue.addSyncTask(_ => resync_local_first(), GLOBAL_SYNC_APP_ID)
                     )}>
                   </IconButton>
                   <IconButton
                     icon={IoArrowDownCircle}
-                    onOKActionDescription="Resync (Cloud First)"
+                    onOKActionDescription={t("target.resyncCloudFirst")}
                     disabled={syncInProgress}
                     onClick={() => confirmPopup(
-                      "Resync (Cloud First)",
+                      t("target.resyncCloudFirst"),
                       <span>
-                        Starting resync, this may take some time.<br /><br />
-                        Click "Confirm" to continue.
+                        {t("target.resyncText")}<br /><br />
+                        {t("common.confirmToContinue")}
                       </span>,
                       () => SyncTaskQueue.addSyncTask(_ => resync_cloud_first(), GLOBAL_SYNC_APP_ID)
                     )}>
@@ -134,34 +135,34 @@ class SyncTargetConfigPage extends RoutePage<SyncTargetConfigPageParams> {
         },
         "separator",
         {
-          title: "Target Filter",
+          title: t("target.targetFilter"),
           visible: true,
           content:
             <FiltersView
-              description={<>Filters specific for <i>{appName}</i> sync. It will be used together with the shared filter, but has a lower priority.</>}
+              description={tx((appId == GLOBAL_SYNC_APP_ID) ? "target.globalFilterDescription" : "target.targetFilterDescription", { app: <i>{appName}</i> })}
               getFiltersFunction={() => SyncFilters.get(appId)}
               setFiltersFunction={(filters) => SyncFilters.set(appId, filters)}
             >
               <IconButton
                 icon={FaCloudArrowUp}
-                onOKActionDescription={`Sync Now (${(appId == GLOBAL_SYNC_APP_ID) ? "Local First" : "Upload to Cloud"})`}
+                onOKActionDescription={t((appId == GLOBAL_SYNC_APP_ID) ? "target.syncNowLocalFirst" : "target.syncNowUpload")}
                 disabled={syncInProgress}
                 onClick={() => SyncTaskQueue.addSyncTask(sync_local_first, appId)}>
               </IconButton>
               <IconButton
                 icon={FaCloudArrowDown}
-                onOKActionDescription={`Sync Now (${(appId == GLOBAL_SYNC_APP_ID) ? "Cloud First" : "Download to Local"})`}
+                onOKActionDescription={t((appId == GLOBAL_SYNC_APP_ID) ? "target.syncNowCloudFirst" : "target.syncNowDownload")}
                 disabled={syncInProgress}
                 onClick={() => SyncTaskQueue.addSyncTask(sync_cloud_first, appId)}>
               </IconButton>
             </FiltersView>
         },
         {
-          title: "Shared Filter",
+          title: t("target.sharedFilter"),
           visible: true,
           content:
             <SharedFiltersView
-              description="Filters that's shared among all syncs. It will be used together with the target filter, but has a higher priority."
+              description={t("target.sharedFilterDescription")}
             />
         },
       ]}

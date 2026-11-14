@@ -16,6 +16,7 @@ import ConfigCloudPage from "./configCloudPage";
 import SyncTaskQueue from "../helpers/syncTaskQueue";
 import Config from "../helpers/config";
 import SyncFilters from "../helpers/syncFilters";
+import { t, tx } from "../i18n";
 
 export default function quickAccessMenu() {
   const [showCaptureOptions, setShowCaptureOptions] = useState<boolean>(Config.get("capture_upload"));
@@ -38,7 +39,7 @@ export default function quickAccessMenu() {
     registrations.push(SyncTaskQueue.on(SyncTaskQueue.events.BUSY, (busy: boolean) => {
       setSyncInProgress(busy);
       if ((busy == false) && (syncTriggeredManually == true)) {
-        Toaster.toast("Sync finished");
+        Toaster.toast(t("toast.syncFinished"));
         syncTriggeredManually = false;
       }
     }));
@@ -64,7 +65,7 @@ export default function quickAccessMenu() {
         }
       `}
       </style>
-      <PanelSection title="Sync">
+      <PanelSection title={t("qam.sync")}>
         <PanelSectionRow>
           <ButtonWithIcon
             icon={<FaSave className={syncInProgress ? "cloudSaveForkRotatingIcon" : ""} />}
@@ -74,13 +75,13 @@ export default function quickAccessMenu() {
               SyncTaskQueue.addSyncTask(sync_cloud_first, GLOBAL_SYNC_APP_ID);
             }}
           >
-            Start Global Sync
+            {t("qam.startGlobalSync")}
           </ButtonWithIcon>
-          {(!globalFilterAvailable) && <small>Please setup the global sync filter via "Global Sync Filters" button first.</small>}
+          {(!globalFilterAvailable) && <small>{t("qam.setupGlobalFilterFirst")}</small>}
         </PanelSectionRow>
         <PanelSectionRow>
           <ToggleField
-            label="Sync on game start"
+            label={t("qam.syncOnGameStart")}
             checked={Config.get("sync_on_game_start")}
             onChange={(e) => {
               Config.set("sync_on_game_start", e);
@@ -89,7 +90,7 @@ export default function quickAccessMenu() {
         </PanelSectionRow>
         <PanelSectionRow>
           <ToggleField
-            label="Sync on game stop"
+            label={t("qam.syncOnGameStop")}
             checked={Config.get("sync_on_game_stop")}
             onChange={(e) => {
               Config.set("sync_on_game_stop", e);
@@ -98,7 +99,7 @@ export default function quickAccessMenu() {
         </PanelSectionRow>
         <PanelSectionRow>
           <ToggleField
-            label="Sync in offline mode"
+            label={t("qam.syncInOfflineMode")}
             checked={Config.get("sync_in_offline_mode")}
             onChange={(e) => {
               Config.set("sync_in_offline_mode", e);
@@ -107,10 +108,10 @@ export default function quickAccessMenu() {
         </PanelSectionRow>
       </PanelSection>
 
-      <PanelSection title="Captures">
+      <PanelSection title={t("qam.captures")}>
         <PanelSectionRow>
           <ToggleField
-            label="Upload captures"
+            label={t("qam.uploadCaptures")}
             checked={Config.get("capture_upload")}
             onChange={e => Config.set("capture_upload", e)}
           />
@@ -118,7 +119,7 @@ export default function quickAccessMenu() {
         {showCaptureOptions && (<>
           <PanelSectionRow>
             <ToggleField
-              label="Delete local copy"
+              label={t("qam.deleteLocalCopy")}
               checked={Config.get("capture_delete_after_upload")}
               onChange={(e) => {
                 Config.set("capture_delete_after_upload", e);
@@ -128,7 +129,7 @@ export default function quickAccessMenu() {
           {showCaptureUploadOnSync && (
             <PanelSectionRow>
               <ToggleField
-                label="Upload on global sync"
+                label={t("qam.uploadOnGlobalSync")}
                 checked={Config.get("capture_upload_on_sync")}
                 onChange={(e) => {
                   Config.set("capture_upload_on_sync", e);
@@ -140,32 +141,32 @@ export default function quickAccessMenu() {
             <ButtonWithIcon
               icon={<FaFileUpload />}
               onClick={() =>
-                Popups.multipleTextInputsPopup("Captures Upload Destinations",
+                Popups.multipleTextInputsPopup(t("qam.uploadDestinationsTitle"),
                   {
-                    "Screenshots": {
+                    [t("qam.screenshots")]: {
                       value: Config.get("capture_upload_destination"),
                       set: (e) => Config.set("capture_upload_destination", e),
                     },
-                    "Clips": {
+                    [t("qam.clips")]: {
                       value: Config.get("capture_upload_destination_video"),
                       set: (e) => Config.set("capture_upload_destination_video", e),
                     },
                   })}
             >
-              Upload Destinations
+              {t("qam.uploadDestinations")}
             </ButtonWithIcon>
           </PanelSectionRow>
         </>)}
       </PanelSection>
     </>)}
-    <PanelSection title="Configuration">
+    <PanelSection title={t("qam.configuration")}>
       {hasProvider && (<>
         <PanelSectionRow>
           <ButtonWithIcon
             icon={<BsFillGearFill />}
             onClick={() => SyncTargetConfigPage.enter({ appId: String(GLOBAL_SYNC_APP_ID) })}
           >
-            Global Sync Filters
+            {t("qam.globalSyncFilters")}
           </ButtonWithIcon>
         </PanelSectionRow>
         <PanelSectionRow>
@@ -173,7 +174,7 @@ export default function quickAccessMenu() {
             icon={<FaFileAlt />}
             onClick={() => PluginLogsPage.enter({})}
           >
-            Plugin Logs
+            {t("logs.pluginLogs")}
           </ButtonWithIcon>
         </PanelSectionRow>
       </>)}
@@ -182,24 +183,24 @@ export default function quickAccessMenu() {
           icon={<MdStorage />}
           onClick={() => ConfigCloudPage.enter({})}
         >
-          Cloud Provider
+          {t("qam.cloudProvider")}
         </ButtonWithIcon>
       </PanelSectionRow>
     </PanelSection>
 
     {hasProvider && (<>
-      <PanelSection title="Advanced Mode">
+      <PanelSection title={t("qam.advancedMode")}>
         <PanelSectionRow>
           <ToggleField
-            label="Enable"
+            label={t("qam.enable")}
             checked={Config.get("advanced_mode")}
             onChange={(e) => {
               if (e) {
-                Popups.confirmPopup("Enable Advanced Mode",
+                Popups.confirmPopup(t("qam.enableAdvancedModeTitle"),
                   <span>
-                    Advanced Mode is only for those who understand what they are doing.<br />
-                    <b>Using options within without caution may cause unrecoverable data loss!</b><br /><br />
-                    Click "Confirm" to continue.
+                    {t("qam.advancedModeText")}<br />
+                    <b>{t("qam.advancedModeWarning")}</b><br /><br />
+                    {t("common.confirmToContinue")}
                   </span>,
                   () => Config.set("advanced_mode", true));
               } else {
@@ -211,14 +212,14 @@ export default function quickAccessMenu() {
         {showAdvancedOptions && (<>
           <PanelSectionRow>
             <ToggleField
-              label="Strict Game Sync"
+              label={t("qam.strictGameSync")}
               checked={Config.get("strict_game_sync")}
               onChange={(e) => {
                 if (e) {
-                  Popups.confirmPopup("Enable Strict Game Sync",
+                  Popups.confirmPopup(t("qam.enableStrictGameSyncTitle"),
                     <span>
-                      This will change rclone to from "COPY" mode to "SYNC" mode when doing game sync, which allows it to <b>DELETE ANY FILES</b> on destination (local/cloud) to make it match the source (cloud/local).<br /><br />
-                      Click "Confirm" to continue.
+                      {tx("qam.strictGameSyncText", { deleteAnyFiles: <b>{t("qam.deleteAnyFiles")}</b> })}<br /><br />
+                      {t("common.confirmToContinue")}
                     </span>,
                     () => Config.set("strict_game_sync", true))
                 } else {
@@ -231,16 +232,16 @@ export default function quickAccessMenu() {
             <ButtonWithIcon
               icon={<FaCloudArrowUp />}
               onClick={() =>
-                Popups.textInputPopup("Global & Game Sync Root", {
+                Popups.textInputPopup(t("qam.syncRootTitle"), {
                   value: Config.get("sync_root"),
                   set: (e) => {
                     if (e != Config.get("sync_root")) {
                       if (Config.get("strict_game_sync")) {
-                        Popups.confirmPopup("Modify Sync Root",
+                        Popups.confirmPopup(t("qam.modifySyncRootTitle"),
                           <span>
-                            You are modifying the sync root with "Strict Game Sync" enabled.<br />
-                            Please make sure all the data are aligned in local and cloud, otherwise data may be lost or even <b>fully deleted</b>!<br /><br />
-                            Click "Confirm" to continue.
+                            {t("qam.modifySyncRootText")}<br />
+                            {tx("qam.dataAlignedWarning", { fullyDeleted: <b>{t("qam.fullyDeleted")}</b> })}<br /><br />
+                            {t("common.confirmToContinue")}
                           </span>,
                           () => Config.set("sync_root", e)
                         )
@@ -252,23 +253,23 @@ export default function quickAccessMenu() {
                 })
               }
             >
-              Set Sync Root
+              {t("qam.setSyncRoot")}
             </ButtonWithIcon>
           </PanelSectionRow>
           <PanelSectionRow>
             <ButtonWithIcon
               icon={<FaCloudArrowDown />}
               onClick={() =>
-                Popups.textInputPopup("Global & Game Sync Destination", {
+                Popups.textInputPopup(t("qam.syncDestinationTitle"), {
                   value: Config.get("sync_destination"),
                   set: (e) => {
                     if (e != Config.get("sync_destination")) {
                       if (Config.get("strict_game_sync")) {
-                        Popups.confirmPopup("Modify Sync Destination",
+                        Popups.confirmPopup(t("qam.modifySyncDestinationTitle"),
                           <span>
-                            You are modifying the sync destination with "Strict Game Sync" enabled.<br />
-                            Please make sure all the data are aligned in local and cloud, otherwise data may be lost or even <b>fully deleted</b>!<br /><br />
-                            Click "Confirm" to continue.
+                            {t("qam.modifySyncDestinationText")}<br />
+                            {tx("qam.dataAlignedWarning", { fullyDeleted: <b>{t("qam.fullyDeleted")}</b> })}<br /><br />
+                            {t("common.confirmToContinue")}
                           </span>,
                           async () => {
                             Config.set("sync_destination", e);
@@ -283,7 +284,7 @@ export default function quickAccessMenu() {
                 })
               }
             >
-              Set Sync Destination
+              {t("qam.setSyncDestination")}
             </ButtonWithIcon>
           </PanelSectionRow>
           <PanelSectionRow>
@@ -291,7 +292,7 @@ export default function quickAccessMenu() {
               icon={<FaArrowCircleUp />}
               onClick={() => updateRclone(true)}
             >
-              Update Rclone
+              {t("qam.updateRclone")}
             </ButtonWithIcon>
           </PanelSectionRow>
         </>)}

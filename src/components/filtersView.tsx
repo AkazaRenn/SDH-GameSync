@@ -11,6 +11,7 @@ import FilterPickerButton from "./filePickerButton";
 import Config from "../helpers/config";
 import Row from "./row";
 import IconButton from "./iconButton";
+import { t } from "../i18n";
 
 interface FiltersViewProps {
   description?: ReactNode;
@@ -97,16 +98,16 @@ export default function filtersView({ description, getFiltersFunction, setFilter
               {showAdvancedOptions && (<>
                 <IconButton
                   icon={FaCopy}
-                  onOKActionDescription="Copy"
+                  onOKActionDescription={t("filters.copy")}
                   onClick={() => {
                     Clipboard.copy(String(props.entry.label));
-                    Toaster.toast("Copied to clipboard");
+                    Toaster.toast(t("toast.copied"));
                   }}
                 />
                 <IconButton
                   icon={FaPen}
-                  onOKActionDescription="Edit"
-                  onClick={() => textInputPopup("Edit Filter", {
+                  onOKActionDescription={t("filters.edit")}
+                  onClick={() => textInputPopup(t("filters.editTitle"), {
                     value: String(props.entry.label),
                     set: (value) => filterEntriesEdit(props.entry.position, value),
                   }
@@ -115,7 +116,7 @@ export default function filtersView({ description, getFiltersFunction, setFilter
               </>)}
               <IconButton
                 icon={MdDelete}
-                onOKActionDescription="Remove"
+                onOKActionDescription={t("filters.remove")}
                 onClick={() => filterEntriesRemove(props.entry.position)}
               />
             </Row>
@@ -131,11 +132,11 @@ export default function filtersView({ description, getFiltersFunction, setFilter
       }}>
         <Row>
           <FilterPickerButton
-            text="Add Include Filter"
+            text={t("filters.addInclude")}
             onConfirm={(path: string) => filterEntriesAppend(`+ ${path}`)}
           />
           <FilterPickerButton
-            text="Add Exclude Filter"
+            text={t("filters.addExclude")}
             onConfirm={(path: string) => filterEntriesAppend(`- ${path}`)}
           />
         </Row>
@@ -145,53 +146,53 @@ export default function filtersView({ description, getFiltersFunction, setFilter
               <DialogButton
                 onClick={() => {
                   Clipboard.copy(filterEntriesToArray().join('\n'));
-                  Toaster.toast("Filters copied to clipboard")
+                  Toaster.toast(t("toast.filtersCopied"))
                 }}
               >
-                Copy Whole Filter
+                {t("filters.copyAll")}
               </DialogButton>
               <DialogButton
                 onClick={() => {
                   const text = Clipboard.paste().trim();
                   if (text) {
                     filterEntriesAppend(text);
-                    Toaster.toast("Filters pasted from clipboard");
+                    Toaster.toast(t("toast.filtersPasted"));
                   } else {
-                    Toaster.toast("Clipboard is empty");
+                    Toaster.toast(t("toast.clipboardEmpty"));
                   }
                 }}
               >
-                Paste Filter (Append)
+                {t("filters.pasteAppend")}
               </DialogButton>
               <DialogButton
                 onClick={() => {
                   const text = Clipboard.paste().trim();
                   if (text) {
                     filterEntriesfromString(text);
-                    Toaster.toast("Filters pasted from clipboard");
+                    Toaster.toast(t("toast.filtersPasted"));
                   } else {
-                    Toaster.toast("Clipboard is empty");
+                    Toaster.toast(t("toast.clipboardEmpty"));
                   }
                 }}
               >
-                Paste Filter (Replace)
+                {t("filters.pasteReplace")}
               </DialogButton>
             </Row>
             <Row>
               <DialogButton
                 onClick={() => textInputPopup(
-                  "Add Arbitrary String", {
+                  t("filters.addArbitraryTitle"), {
                     value: "",
                     set: (value: string) => filterEntriesAppend(`${value}`),
                   }
                 )}
               >
-                Add Arbitrary Line
+                {t("filters.addArbitrary")}
               </DialogButton>
               <DialogButton
                 onClick={() => setFilterEntries([])}
               >
-                Delete All
+                {t("filters.deleteAll")}
               </DialogButton>
             </Row>
           </>
@@ -204,7 +205,7 @@ export default function filtersView({ description, getFiltersFunction, setFilter
             onGamepadFocus={() => saveButtonRef.current && (saveButtonRef.current.style.backgroundColor = "white")}
             onGamepadBlur={() => saveButtonRef.current && (saveButtonRef.current.style.backgroundColor = CSS_STEAM_HIGHLIGHT_COLOR)}
           >
-            Save
+            {t("filters.save")}
           </DialogButton>
         </Row>
       </div>

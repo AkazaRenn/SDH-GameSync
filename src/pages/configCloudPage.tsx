@@ -8,6 +8,7 @@ import { get_cloud_type, create_cloud_destination } from "../helpers/backend";
 import Container from "../components/container";
 import RoutePage from "../components/routePage";
 import Config from "../helpers/config";
+import { t, tx } from "../i18n";
 
 async function openConfig(cloud: "onedrive" | "drive" | "dropbox") {
   const url = await spawn(cloud);
@@ -17,11 +18,11 @@ async function openConfig(cloud: "onedrive" | "drive" | "dropbox") {
       await sleep(500);
       if (await spawn_probe() !== null) {
         confirmPopup(
-          "Create cloud folder for sync?",
+          t("cloud.createFolderTitle"),
           <p>
-            If you have successfully configured the cloud provider, now it's time to create the destination folder <i>{Config.get("sync_destination")}</i> in the cloud for sync.<br /><br />
-            To trigger that, click "Confirm".<br />
-            If you have other plans, feel free to dismiss it by clicking "Cancel".
+            {tx("cloud.createFolderText1", { folder: <i>{Config.get("sync_destination")}</i> })}<br /><br />
+            {t("cloud.createFolderText2")}<br />
+            {t("cloud.createFolderText3")}
           </p>,
           create_cloud_destination
         );
@@ -46,7 +47,7 @@ async function getCloudBackend(): Promise<string> {
     case "dropbox":
       return "Dropbox";
     default:
-      return "Other: " + cloudType;
+      return t("cloud.other", { type: cloudType });
   }
 }
 
@@ -61,18 +62,18 @@ class ConfigCloudPage extends RoutePage {
         if (cloud) {
           setProvider(`☁️ ${cloud} ☁️`);
         } else {
-          setProvider("❌ N/A ❌");
+          setProvider(`❌ ${t("cloud.none")} ❌`);
         }
       })
     }, []);
 
     return (
-      <Container title="Configure Cloud Storage Provider">
+      <Container title={t("cloud.pageTitle")}>
         <PanelSection>
-          <strong>Currently using: {provider}</strong>
+          <strong>{t("cloud.currentlyUsing", { provider: provider ?? "" })}</strong>
         </PanelSection>
         <PanelSection>
-          <small>Click one of the providers below to configure the backup destination</small>
+          <small>{t("cloud.chooseProvider")}</small>
           <PanelSectionRow>
             <ButtonItem onClick={() => openConfig("onedrive")} icon={<ImOnedrive />} label="OneDrive">
               <BsGearFill />
@@ -82,7 +83,7 @@ class ConfigCloudPage extends RoutePage {
             <ButtonItem
               onClick={() => openConfig("drive")}
               icon={<ImGoogleDrive />}
-              label="Google Drive (may not work if Google does not trust the Steam Browser)"
+              label={t("cloud.googleDrive")}
             >
               <BsGearFill />
             </ButtonItem>
@@ -95,15 +96,15 @@ class ConfigCloudPage extends RoutePage {
           <PanelSectionRow>
             <ButtonItem
               onClick={() =>
-                confirmPopup("Adding Other Providers",
+                confirmPopup(t("cloud.otherTitle"),
                   <span style={{ whiteSpace: "pre-wrap" }}>
-                    In addition to the providers listed above, others can also be configured. Unfortunately, setup for them can only be done in desktop mode.<br />
-                    Please refer to rclone config documents (<a href="https://rclone.org/commands/rclone_config_create/">https://rclone.org/commands/rclone_config_create/</a>) for more information.<br />
-                    Use "cloud" for remote name if you are doing it.
+                    {t("cloud.otherText1")}<br />
+                    {tx("cloud.otherText2", { link: <a href="https://rclone.org/commands/rclone_config_create/">https://rclone.org/commands/rclone_config_create/</a> })}<br />
+                    {t("cloud.otherText3")}
                   </span>
                 )}
               icon={<ImHome />}
-              label="Other (Advanced)"
+              label={t("cloud.otherButton")}
             >
               <BsPatchQuestionFill />
             </ButtonItem>

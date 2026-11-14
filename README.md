@@ -119,6 +119,10 @@ Changing sync destination on the cloud is possible from `Quick Access Menu - Adv
 ### Additional Sync Arguments
 You can add addition sync arguments to the entries `additional_sync_args` and `additional_bisync_args` in `config.json`. Entries in `additional_sync_args` will be applied to both per-game syncs and global syncs, while `additional_bisync_args` will only be applied to global syncs, since per-game syncs do not use bisync.
 
+## Translations
+
+The interface follows the Steam language. Available: English, French. To add a language, copy `src/i18n/locales/en.ts`, translate the values (keep the `{{placeholders}}`) and register it in `src/i18n/index.ts`; missing keys fall back to English.
+
 ## Acknowledgments
 Thank you to:
 * [GedasFX](https://github.com/GedasFX) for the amazing work of the original [Decky Cloud Save](https://github.com/GedasFX/decky-cloud-save)!
