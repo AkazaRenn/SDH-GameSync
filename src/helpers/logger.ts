@@ -5,7 +5,7 @@ import {
     log_info,
     log_warning,
 } from "./backend";
-import DeckyLogger from "../deps/decky_logger";
+import DeckyLogger from "@decky/ui/dist/logger";
 
 class Logger extends DeckyLogger {
     async debug(...args: any[]) {

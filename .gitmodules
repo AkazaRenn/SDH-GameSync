@@ -1,3 +1,0 @@
-[submodule "deps/decky-loader"]
-	path = deps/decky-loader
-	url = https://github.com/SteamDeckHomebrew/decky-loader.git

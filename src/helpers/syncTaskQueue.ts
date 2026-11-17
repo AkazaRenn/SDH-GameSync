@@ -8,7 +8,7 @@ import Logger from "./logger"
 import Config from "./config";
 import SyncFilters from "./syncFilters";
 import { GLOBAL_SYNC_APP_ID } from "./commonDefs";
-import { EResult } from "@decky/ui";
+import { EResult } from "@decky/ui/dist/globals/steam-client/shared";
 
 async function worker(fn: () => Promise<number>): Promise<number | undefined> {
   try {
