@@ -8,6 +8,7 @@ import { get_cloud_type, create_cloud_destination } from "../helpers/backend";
 import Container from "../components/container";
 import RoutePage from "../components/routePage";
 import Config from "../helpers/config";
+import { CSS_BPM_BOTTOM_BAR_HEIGHT, CSS_BPM_TOP_BAR_HEIGHT } from "../helpers/commonDefs";
 
 async function openConfig(cloud: "onedrive" | "drive" | "dropbox") {
   const url = await spawn(cloud);
@@ -67,49 +68,56 @@ class ConfigCloudPage extends RoutePage {
     }, []);
 
     return (
-      <Container title="Configure Cloud Storage Provider">
-        <PanelSection>
-          <strong>Currently using: {provider}</strong>
-        </PanelSection>
-        <PanelSection>
-          <small>Click one of the providers below to configure the backup destination</small>
-          <PanelSectionRow>
-            <ButtonItem onClick={() => openConfig("onedrive")} icon={<ImOnedrive />} label="OneDrive">
-              <BsGearFill />
-            </ButtonItem>
-          </PanelSectionRow>
-          <PanelSectionRow>
-            <ButtonItem
-              onClick={() => openConfig("drive")}
-              icon={<ImGoogleDrive />}
-              label="Google Drive (may not work if Google does not trust the Steam Browser)"
-            >
-              <BsGearFill />
-            </ButtonItem>
-          </PanelSectionRow>
-          <PanelSectionRow>
-            <ButtonItem onClick={() => openConfig("dropbox")} icon={<ImDropbox />} label="Dropbox">
-              <BsGearFill />
-            </ButtonItem>
-          </PanelSectionRow>
-          <PanelSectionRow>
-            <ButtonItem
-              onClick={() =>
-                confirmPopup("Adding Other Providers",
-                  <span style={{ whiteSpace: "pre-wrap" }}>
-                    In addition to the providers listed above, others can also be configured. Unfortunately, setup for them can only be done in desktop mode.<br />
-                    Please refer to rclone config documents (<a href="https://rclone.org/commands/rclone_config_create/">https://rclone.org/commands/rclone_config_create/</a>) for more information.<br />
-                    Use "cloud" for remote name if you are doing it.
-                  </span>
-                )}
-              icon={<ImHome />}
-              label="Other (Advanced)"
-            >
-              <BsPatchQuestionFill />
-            </ButtonItem>
-          </PanelSectionRow>
-        </PanelSection>
-      </Container >
+      <div
+        style={{
+          overflowY: "auto",
+          marginTop: `calc(${CSS_BPM_TOP_BAR_HEIGHT} - 24px)`,
+          marginBottom: CSS_BPM_BOTTOM_BAR_HEIGHT,
+        }}>
+        <Container title="Configure Cloud Storage Provider">
+          <PanelSection>
+            <strong>Currently using: {provider}</strong>
+          </PanelSection>
+          <PanelSection>
+            <small>Click one of the providers below to configure the backup destination</small>
+            <PanelSectionRow>
+              <ButtonItem onClick={() => openConfig("onedrive")} icon={<ImOnedrive />} label="OneDrive">
+                <BsGearFill />
+              </ButtonItem>
+            </PanelSectionRow>
+            <PanelSectionRow>
+              <ButtonItem
+                onClick={() => openConfig("drive")}
+                icon={<ImGoogleDrive />}
+                label="Google Drive (may not work if Google does not trust the Steam Browser)"
+              >
+                <BsGearFill />
+              </ButtonItem>
+            </PanelSectionRow>
+            <PanelSectionRow>
+              <ButtonItem onClick={() => openConfig("dropbox")} icon={<ImDropbox />} label="Dropbox">
+                <BsGearFill />
+              </ButtonItem>
+            </PanelSectionRow>
+            <PanelSectionRow>
+              <ButtonItem
+                onClick={() =>
+                  confirmPopup("Adding Other Providers",
+                    <span style={{ whiteSpace: "pre-wrap" }}>
+                      In addition to the providers listed above, others can also be configured. Unfortunately, setup for them can only be done in desktop mode.<br />
+                      Please refer to rclone config documents (<a href="https://rclone.org/commands/rclone_config_create/">https://rclone.org/commands/rclone_config_create/</a>) for more information.<br />
+                      Use "cloud" for remote name if you are doing it.
+                    </span>
+                  )}
+                icon={<ImHome />}
+                label="Other (Advanced)"
+              >
+                <BsPatchQuestionFill />
+              </ButtonItem>
+            </PanelSectionRow>
+          </PanelSection>
+        </Container >
+      </div>
     );
   }
 }
