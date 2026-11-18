@@ -5,7 +5,7 @@ import { ButtonItem, Navigation, PanelSection, PanelSectionRow, sleep } from "@d
 import { spawn, spawn_probe } from "../helpers/backend";
 import { confirmPopup } from "../components/popups";
 import { get_cloud_type, create_cloud_destination } from "../helpers/backend";
-import Container from "../components/container";
+import ScrollablePage from "../components/scrollablePage";
 import RoutePage from "../components/routePage";
 import Config from "../helpers/config";
 
@@ -67,7 +67,7 @@ class ConfigCloudPage extends RoutePage {
     }, []);
 
     return (
-      <Container title="Configure Cloud Storage Provider">
+      <ScrollablePage title="Configure Cloud Storage Provider">
         <PanelSection>
           <strong>Currently using: {provider}</strong>
         </PanelSection>
@@ -109,7 +109,7 @@ class ConfigCloudPage extends RoutePage {
             </ButtonItem>
           </PanelSectionRow>
         </PanelSection>
-      </Container >
+      </ScrollablePage>
     );
   }
 }
